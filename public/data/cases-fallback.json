@@ -1,0 +1,71 @@
+[
+  {
+    "id": "case-001",
+    "channelName": "Gearhead Garage",
+    "channelUrl": "https://youtube.com/@gearheadgarage",
+    "status": "TERMINATED",
+    "reason": "Spam, deceptive practices",
+    "appealStatus": "FINAL_DENIED",
+    "submittedDate": "2024-01-15",
+    "lastUpdated": "2024-01-20",
+    "description": "Channel was terminated for alleged spam and deceptive practices. Creator claims content was educational automotive content.",
+    "subscriberCount": 125000,
+    "category": "Automotive",
+    "reviewTimeDays": 5
+  },
+  {
+    "id": "case-002",
+    "channelName": "World History Explorer",
+    "channelUrl": "https://youtube.com/@worldhistoryexplorer",
+    "status": "TERMINATED",
+    "reason": "Circumventing systems",
+    "appealStatus": "UNDER_REVIEW",
+    "submittedDate": "2024-01-18",
+    "lastUpdated": "2024-01-25",
+    "description": "Channel terminated for allegedly circumventing YouTube's systems. Creator maintains innocence.",
+    "subscriberCount": 45000,
+    "category": "Education",
+    "reviewTimeDays": 7
+  },
+  {
+    "id": "case-003",
+    "channelName": "SussySnake",
+    "channelUrl": "https://youtube.com/@sussysnake",
+    "status": "REINSTATED",
+    "reason": "Harmful content",
+    "appealStatus": "OVERTURNED",
+    "submittedDate": "2024-01-10",
+    "lastUpdated": "2024-01-24",
+    "description": "Channel was initially terminated for harmful content but was reinstated after appeal review.",
+    "subscriberCount": 89000,
+    "category": "Gaming",
+    "reviewTimeDays": 14
+  },
+  {
+    "id": "case-004",
+    "channelName": "Tech Tutorials Pro",
+    "channelUrl": "https://youtube.com/@techtutorialspro",
+    "status": "DEMONETIZED",
+    "reason": "Reused content",
+    "appealStatus": "UNDER_REVIEW",
+    "submittedDate": "2024-01-20",
+    "description": "Channel demonetized for reused content. Creator claims all content is original.",
+    "subscriberCount": 230000,
+    "category": "Technology",
+    "reviewTimeDays": 3
+  },
+  {
+    "id": "case-005",
+    "channelName": "Cooking With Mom",
+    "channelUrl": "https://youtube.com/@cookingwithmom",
+    "status": "AGE_RESTRICTED",
+    "reason": "Inappropriate content",
+    "appealStatus": "PENDING",
+    "submittedDate": "2024-01-22",
+    "description": "Channel age-restricted for allegedly inappropriate content. Creator believes this was a mistake.",
+    "subscriberCount": 67000,
+    "category": "Food",
+    "reviewTimeDays": 1
+  }
+]
+
