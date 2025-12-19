@@ -33,7 +33,6 @@ async function getAllCases(): Promise<YouTubeCase[]> {
 
     // Check if we got HTML instead of CSV (redirect or error page)
     if (csvText.trim().startsWith('<')) {
-      console.error('Received HTML instead of CSV. Response preview:', csvText.substring(0, 200));
       throw new Error('Received HTML instead of CSV data. Check CSV URL.');
     }
 
@@ -44,20 +43,8 @@ async function getAllCases(): Promise<YouTubeCase[]> {
         transformHeader: (header) => header.trim(),
         transform: (value) => typeof value === 'string' ? value.trim() : value,
         complete: (results) => {
-          if (results.errors && results.errors.length > 0) {
-            console.error('CSV parsing errors:', results.errors);
-            // Continue anyway, but log errors
-          }
-
           const rows = results.data.map(trimObject);
           const cases: YouTubeCase[] = [];
-
-          // Log first row to debug column names
-          if (rows.length > 0) {
-            console.log('CSV columns found:', Object.keys(rows[0]));
-          } else {
-            console.warn('No rows found in CSV data');
-          }
 
           rows.forEach((row: Record<string, any>, index: number) => {
             // Helper function to find field by multiple possible names (case-insensitive)
@@ -89,11 +76,9 @@ async function getAllCases(): Promise<YouTubeCase[]> {
               );
               if (firstNonEmpty) {
                 channelName = firstNonEmpty.toString().trim();
-                console.log(`Row ${index + 1}: Using first non-empty field as channel name: "${channelName}"`);
               } else {
                 // Don't skip - use row index as channel name if nothing else works
                 channelName = `Case ${index + 1}`;
-                console.log(`Row ${index + 1}: No channel name found, using default: "${channelName}"`);
               }
             }
 
@@ -210,10 +195,6 @@ async function getAllCases(): Promise<YouTubeCase[]> {
             cases.push(caseItem);
           });
 
-          console.log(`Parsed ${cases.length} cases from ${rows.length} CSV rows`);
-          if (cases.length !== rows.length) {
-            console.warn(`Warning: Only parsed ${cases.length} cases out of ${rows.length} rows. Some rows may have been skipped.`);
-          }
           resolve(cases);
         },
         error: (error) => {
@@ -222,7 +203,6 @@ async function getAllCases(): Promise<YouTubeCase[]> {
       });
     });
   } catch (error) {
-    console.error('Error fetching from Google Sheet:', error);
     // Fallback to JSON
     try {
       const fs = require('fs');
@@ -231,7 +211,6 @@ async function getAllCases(): Promise<YouTubeCase[]> {
       const fileContents = fs.readFileSync(filePath, 'utf8');
       return JSON.parse(fileContents);
     } catch (fallbackError) {
-      console.error('Error reading fallback data:', fallbackError);
       throw error;
     }
   }
@@ -266,7 +245,6 @@ export async function GET(
     }
     
     if (!caseItem) {
-      console.log(`Case not found: ${caseId}. Available IDs:`, cases.slice(0, 5).map(c => c.id));
       return NextResponse.json(
         { error: 'Case not found' },
         { status: 404 }
@@ -275,7 +253,6 @@ export async function GET(
     
     return NextResponse.json(caseItem);
   } catch (error) {
-    console.error('Error fetching case:', error);
     return NextResponse.json(
       { error: 'Failed to fetch case' },
       { status: 500 }

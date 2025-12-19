@@ -46,10 +46,6 @@ export async function GET() {
         transformHeader: (header) => header.trim(),
         transform: (value) => typeof value === 'string' ? value.trim() : value,
         complete: (results) => {
-          if (results.errors && results.errors.length > 0) {
-            console.error('CSV parsing errors:', results.errors);
-            // Continue anyway, but log errors
-          }
 
           const data = results.data.map(trimObject);
           
@@ -74,7 +70,6 @@ export async function GET() {
       });
     });
   } catch (error) {
-    console.error('Error fetching terminations CSV:', error);
     return NextResponse.json(
       { 
         error: 'Failed to fetch terminations data',

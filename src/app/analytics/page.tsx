@@ -47,7 +47,6 @@ export default function AnalyticsPage() {
         setCases(data);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load data');
-        console.error(err);
       } finally {
         setLoading(false);
       }
@@ -370,7 +369,7 @@ export default function AnalyticsPage() {
         </div>
 
         {/* Additional Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
           <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
             <div className="text-gray-600 text-sm mb-2">Total Cases</div>
             <div className="text-3xl font-bold text-gray-900">{cases.length}</div>
@@ -382,12 +381,6 @@ export default function AnalyticsPage() {
                 ? `${((cases.filter(c => c.status === 'REINSTATED').length / cases.length) * 100).toFixed(1)}%`
                 : '0%'
               }
-            </div>
-          </div>
-          <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
-            <div className="text-gray-600 text-sm mb-2">Under Review</div>
-            <div className="text-3xl font-bold text-blue-600">
-              {cases.filter(c => c.appealStatus === 'UNDER_REVIEW' || c.appealStatus === 'PENDING').length}
             </div>
           </div>
         </div>

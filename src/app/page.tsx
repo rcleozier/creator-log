@@ -105,7 +105,6 @@ export default function Home() {
         setCases(data);
       } catch (err) {
         setError('Failed to load cases. Please try again later.');
-        console.error(err);
       } finally {
         setLoading(false);
       }
@@ -134,7 +133,7 @@ export default function Home() {
           underReview,
         });
       } catch (err) {
-        console.error('Failed to fetch stats:', err);
+        // Silently fail
       }
     }
 

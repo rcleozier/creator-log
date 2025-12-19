@@ -54,7 +54,7 @@ export default function AboutPage() {
               </p>
               <p className="leading-relaxed">
                 This tracker documents cases of YouTube channel terminations, demonetizations, age restrictions, 
-                and strikes starting from <strong>2024 and onward</strong>. By collecting and analyzing community-reported 
+                and strikes. By collecting and analyzing community-reported 
                 data, we aim to help creators understand patterns, outcomes, and timelines in the appeals process.
               </p>
               <p className="leading-relaxed mt-4 text-sm text-gray-600">
@@ -65,7 +65,7 @@ export default function AboutPage() {
             <div>
               <h2 className="text-2xl font-bold mb-4 text-gray-900">Scope</h2>
               <p className="leading-relaxed mb-4">
-                This tracker focuses on cases from <strong>2024 and onward</strong>. We track:
+                This tracker tracks the following types of cases:
               </p>
               <ul className="list-disc list-inside space-y-2 ml-4 text-gray-700">
                 <li>Channel terminations and appeals</li>
@@ -89,8 +89,7 @@ export default function AboutPage() {
             <div>
               <h2 className="text-2xl font-bold mb-4 text-gray-900">About the Project</h2>
               <p className="leading-relaxed">
-                This tracker is maintained by <strong>@RobsManifesto</strong> on Twitter/X, tracking cases from 
-                2024 and onward. The goal is to keep a comprehensive record of these cases to help the creator 
+                This tracker is maintained by <strong>@RobsManifesto</strong> on Twitter/X. The goal is to keep a comprehensive record of these cases to help the creator 
                 community understand enforcement patterns and appeal outcomes.
               </p>
               <p className="mt-4 leading-relaxed">
@@ -134,7 +133,6 @@ export default function AboutPage() {
                 If you have a case to report, please use our submission form. We're looking for:
               </p>
               <ul className="list-disc list-inside space-y-2 ml-4 text-gray-700">
-                <li>Cases from 2024 or later</li>
                 <li>Accurate information about the enforcement action</li>
                 <li>Timeline details (when it happened, appeal status)</li>
                 <li>Reason provided by YouTube</li>

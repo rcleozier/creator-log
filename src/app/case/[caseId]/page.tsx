@@ -143,12 +143,9 @@ export default function CasePage() {
           throw new Error('Failed to fetch case');
         }
         const data = await response.json();
-        console.log('Case data received:', data);
-        console.log('Twitter handle:', data.twitterHandle);
         setCaseData(data);
       } catch (err) {
         setError('Failed to load case. Please try again later.');
-        console.error(err);
       } finally {
         setLoading(false);
       }

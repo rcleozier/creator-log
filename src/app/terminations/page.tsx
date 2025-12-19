@@ -61,9 +61,16 @@ function getStatusColor(status: string | undefined): string {
   return 'bg-gray-100 text-gray-700 border-gray-300';
 }
 
+interface Case {
+  id: string;
+  channelName: string;
+  channelUrl?: string;
+}
+
 export default function TerminationsPage() {
   const [data, setData] = useState<TerminationRow[]>([]);
   const [columns, setColumns] = useState<string[]>([]);
+  const [cases, setCases] = useState<Case[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
@@ -74,12 +81,18 @@ export default function TerminationsPage() {
     async function fetchTerminations() {
       setLoading(true);
       try {
-        const response = await fetch('/api/terminations');
-        if (!response.ok) {
-          const errorData = await response.json();
+        // Fetch both terminations data and cases data
+        const [terminationsResponse, casesResponse] = await Promise.all([
+          fetch('/api/terminations'),
+          fetch('/api/cases')
+        ]);
+
+        if (!terminationsResponse.ok) {
+          const errorData = await terminationsResponse.json();
           throw new Error(errorData.error || 'Failed to fetch terminations');
         }
-        const result = await response.json();
+
+        const result = await terminationsResponse.json();
         
         if (result.error) {
           throw new Error(result.error);
@@ -87,6 +100,12 @@ export default function TerminationsPage() {
 
         const rows = result.data || [];
         const cols = result.meta?.columns || (rows.length > 0 ? Object.keys(rows[0]) : []);
+
+        // Fetch cases for linking
+        if (casesResponse.ok) {
+          const casesData = await casesResponse.json();
+          setCases(casesData || []);
+        }
 
         // Define priority columns to show first
         const priorityColumns = [
@@ -100,13 +119,16 @@ export default function TerminationsPage() {
         ];
 
         // Sort columns: priority first, then rest
-        // Exclude "Status" column (internal column, not for display)
+        // Exclude "Status" column (internal column, not for display) and "Case ID" column
         const sortedColumns = [
           ...priorityColumns.filter(col => cols.some((c: string) => 
             c.toLowerCase() === col.toLowerCase()
           )),
           ...cols.filter((col: string) => 
             col.toLowerCase() !== 'status' && // Exclude Status column
+            col.toLowerCase() !== 'case id' && // Exclude Case ID column
+            col.toLowerCase() !== 'caseid' && // Exclude Case ID column (alternative)
+            col.toLowerCase() !== 'id' && // Exclude ID column
             !priorityColumns.some(pc => 
               pc.toLowerCase() === col.toLowerCase()
             )
@@ -117,7 +139,6 @@ export default function TerminationsPage() {
         setData(rows);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load terminations');
-        console.error(err);
       } finally {
         setLoading(false);
       }
@@ -288,39 +309,61 @@ export default function TerminationsPage() {
                     </td>
                   </tr>
                 ) : (
-                  displayedData.map((row, idx) => (
-                    <tr
-                      key={idx}
-                      className="border-b border-gray-200 hover:bg-gray-50 transition-colors"
-                    >
-                      {columns.map((col) => {
-                        const value = row[col] || '';
-                        const isStatusCol = col.toLowerCase() === 'channel status';
-                        const isUrlValue = isUrl(value);
+                  displayedData.map((row, idx) => {
+                    // Find matching case by channel name or URL
+                    const channelName = row['Channel Name'] || '';
+                    const channelUrl = row['Channel URL'] || '';
+                    const matchingCase = cases.find(c => 
+                      (c.channelName && channelName && 
+                       c.channelName.toLowerCase() === channelName.toLowerCase()) ||
+                      (c.channelUrl && channelUrl && 
+                       c.channelUrl.toLowerCase() === channelUrl.toLowerCase())
+                    );
 
-                        return (
-                          <td key={col} className="py-4 px-6 text-sm min-w-0">
-                            {isStatusCol ? (
-                              <span className={`px-3 py-1 rounded-lg text-xs font-semibold border ${getStatusColor(value)}`}>
-                                {escapeHtml(value)}
-                              </span>
-                            ) : isUrlValue ? (
-                              <a
-                                href={formatUrl(value)}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-red-400 hover:text-red-300 break-all"
-                              >
-                                {escapeHtml(value)}
-                              </a>
-                            ) : (
-                              <span className="text-gray-700 break-words">{escapeHtml(value)}</span>
-                            )}
-                          </td>
-                        );
-                      })}
-                    </tr>
-                  ))
+                    const handleRowClick = matchingCase 
+                      ? () => window.location.href = `/case/${matchingCase.id}`
+                      : undefined;
+
+                    return (
+                      <tr
+                        key={idx}
+                        onClick={handleRowClick}
+                        className={`border-b border-gray-200 transition-colors ${
+                          matchingCase 
+                            ? 'hover:bg-gray-50 cursor-pointer' 
+                            : 'hover:bg-gray-50'
+                        }`}
+                      >
+                        {columns.map((col) => {
+                          const value = row[col] || '';
+                          const isStatusCol = col.toLowerCase() === 'channel status';
+                          const isUrlValue = isUrl(value);
+
+                          return (
+                            <td key={col} className="py-4 px-6 text-sm min-w-0">
+                              {isStatusCol ? (
+                                <span className={`px-3 py-1 rounded-lg text-xs font-semibold border ${getStatusColor(value)}`}>
+                                  {escapeHtml(value)}
+                                </span>
+                              ) : isUrlValue ? (
+                                <a
+                                  href={formatUrl(value)}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-red-400 hover:text-red-300 break-all"
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  {escapeHtml(value)}
+                                </a>
+                              ) : (
+                                <span className="text-gray-700 break-words">{escapeHtml(value)}</span>
+                              )}
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    );
+                  })
                 )}
               </tbody>
             </table>

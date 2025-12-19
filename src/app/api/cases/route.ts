@@ -33,7 +33,6 @@ async function fetchFromGoogleSheet(): Promise<YouTubeCase[]> {
 
     // Check if we got HTML instead of CSV (redirect or error page)
     if (csvText.trim().startsWith('<')) {
-      console.error('Received HTML instead of CSV. Response preview:', csvText.substring(0, 200));
       throw new Error('Received HTML instead of CSV data. Check CSV URL.');
     }
 
@@ -44,42 +43,8 @@ async function fetchFromGoogleSheet(): Promise<YouTubeCase[]> {
         transformHeader: (header) => header.trim(),
         transform: (value) => typeof value === 'string' ? value.trim() : value,
         complete: (results) => {
-          if (results.errors && results.errors.length > 0) {
-            console.error('CSV parsing errors:', results.errors);
-            // Continue anyway, but log errors
-          }
-
           const rows = results.data.map(trimObject);
           const cases: YouTubeCase[] = [];
-
-          // Log first row to debug column names
-          if (rows.length > 0) {
-            console.log('CSV columns found:', Object.keys(rows[0]));
-            console.log('First row sample:', JSON.stringify(rows[0], null, 2));
-            // Check if Twitter Handle column exists
-            const twitterCol = Object.keys(rows[0]).find((f: string) => 
-              f.toLowerCase().includes('twitter') || f.toLowerCase().includes('x handle')
-            );
-            if (twitterCol) {
-              console.log(`Found Twitter-related column: "${twitterCol}"`);
-              console.log(`Value in first row: "${rows[0][twitterCol]}"`);
-            } else {
-              console.warn('No Twitter Handle column found in CSV');
-            }
-            // Check if Notes column exists
-            const notesCol = Object.keys(rows[0]).find((f: string) => 
-              f.toLowerCase() === 'notes' || f.toLowerCase().includes('notes')
-            );
-            if (notesCol) {
-              console.log(`Found Notes column: "${notesCol}"`);
-              const notesValue = rows[0][notesCol];
-              if (notesValue) {
-                console.log(`Notes value preview (first 100 chars): "${notesValue.toString().substring(0, 100)}..."`);
-              }
-            }
-          } else {
-            console.warn('No rows found in CSV data');
-          }
 
           rows.forEach((row: Record<string, any>, index: number) => {
             // Helper function to find field by multiple possible names (case-insensitive)
@@ -111,11 +76,9 @@ async function fetchFromGoogleSheet(): Promise<YouTubeCase[]> {
               );
               if (firstNonEmpty) {
                 channelName = firstNonEmpty.toString().trim();
-                console.log(`Row ${index + 1}: Using first non-empty field as channel name: "${channelName}"`);
               } else {
                 // Don't skip - use row index as channel name if nothing else works
                 channelName = `Case ${index + 1}`;
-                console.log(`Row ${index + 1}: No channel name found, using default: "${channelName}"`);
               }
             }
 
@@ -187,27 +150,21 @@ async function fetchFromGoogleSheet(): Promise<YouTubeCase[]> {
               id: generateStableId(),
               channelName: channelName,
               channelUrl: findField(['channel url', 'channelurl', 'url', 'channel link']),
-              twitterHandle: (() => {
-                const handle = findField([
-                  'Twitter Handle',  // Exact match for the column name
-                  'twitter handle', 
-                  'twitterhandle', 
-                  'twitter', 
-                  'x handle',
-                  'x handle (twitter)',
-                  'twitter/x',
-                  'twitter username',
-                  'twitterusername',
-                  'x username',
-                  'xusername',
-                  'contact',
-                  'twitter contact'
-                ]);
-                if (handle && index === 0) {
-                  console.log(`Found Twitter Handle for row ${index + 1}: "${handle}"`);
-                }
-                return handle;
-              })(),
+              twitterHandle: findField([
+                'Twitter Handle',  // Exact match for the column name
+                'twitter handle', 
+                'twitterhandle', 
+                'twitter', 
+                'x handle',
+                'x handle (twitter)',
+                'twitter/x',
+                'twitter username',
+                'twitterusername',
+                'x username',
+                'xusername',
+                'contact',
+                'twitter contact'
+              ]),
               status: (statusRaw.toUpperCase() as YouTubeCase['status']) || 'TERMINATED',
               reason: findField(['reason', 'reason given', 'reasongiven', 'termination reason']) || '',
               appealStatus: (appealStatus as YouTubeCase['appealStatus']) || 'PENDING',
@@ -235,10 +192,6 @@ async function fetchFromGoogleSheet(): Promise<YouTubeCase[]> {
             cases.push(caseItem);
           });
 
-          console.log(`Parsed ${cases.length} cases from ${rows.length} CSV rows`);
-          if (cases.length !== rows.length) {
-            console.warn(`Warning: Only parsed ${cases.length} cases out of ${rows.length} rows. Some rows may have been skipped.`);
-          }
           resolve(cases);
         },
         error: (error) => {
@@ -247,7 +200,6 @@ async function fetchFromGoogleSheet(): Promise<YouTubeCase[]> {
       });
     });
   } catch (error) {
-    console.error('Error fetching from Google Sheet:', error);
     throw error;
   }
 }
@@ -261,7 +213,6 @@ async function getFallbackData(): Promise<YouTubeCase[]> {
     const fileContents = fs.readFileSync(filePath, 'utf8');
     return JSON.parse(fileContents);
   } catch (error) {
-    console.error('Error reading fallback data:', error);
     // Return empty array if fallback also fails
     return [];
   }
@@ -276,12 +227,11 @@ export async function GET(request: Request) {
     let cases: YouTubeCase[] = [];
 
     // Try Google Sheet first, fallback to JSON
-    try {
-      cases = await fetchFromGoogleSheet();
-    } catch (error) {
-      console.warn('Google Sheet fetch failed, using fallback:', error);
-      cases = await getFallbackData();
-    }
+        try {
+          cases = await fetchFromGoogleSheet();
+        } catch (error) {
+          cases = await getFallbackData();
+        }
 
     // Apply filters
     if (status) {
@@ -297,13 +247,12 @@ export async function GET(request: Request) {
       );
     }
 
-    return NextResponse.json(cases);
-  } catch (error) {
-    console.error('Error fetching cases:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch cases' },
-      { status: 500 }
-    );
-  }
+        return NextResponse.json(cases);
+      } catch (error) {
+        return NextResponse.json(
+          { error: 'Failed to fetch cases' },
+          { status: 500 }
+        );
+      }
 }
 
