@@ -46,7 +46,7 @@ export async function GET() {
         transformHeader: (header) => header.trim(),
         transform: (value) => typeof value === 'string' ? value.trim() : value,
         complete: (results) => {
-          const data = results.data.map(trimObject);
+          const data = (results.data as Record<string, any>[]).map(trimObject);
           
           resolve(NextResponse.json({
             data,
@@ -57,7 +57,7 @@ export async function GET() {
             }
           }));
         },
-        error: (error) => {
+        error: (error: Error) => {
           resolve(NextResponse.json(
             { 
               error: 'Failed to parse CSV',

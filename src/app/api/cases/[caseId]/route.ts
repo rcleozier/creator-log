@@ -43,7 +43,7 @@ async function getAllCases(): Promise<YouTubeCase[]> {
         transformHeader: (header) => header.trim(),
         transform: (value) => typeof value === 'string' ? value.trim() : value,
         complete: (results) => {
-          const rows = results.data.map(trimObject);
+          const rows = (results.data as Record<string, any>[]).map(trimObject);
           const cases: YouTubeCase[] = [];
 
           rows.forEach((row: Record<string, any>, index: number) => {
@@ -148,7 +148,7 @@ async function getAllCases(): Promise<YouTubeCase[]> {
 
             const caseItem: YouTubeCase = {
               id: generateStableId(),
-              channelName: channelName,
+              channelName: channelName || `Unnamed Channel ${index + 1}`,
               channelUrl: findField(['channel url', 'channelurl', 'url', 'channel link']),
               twitterHandle: (() => {
                 const handle = findField([
@@ -197,7 +197,7 @@ async function getAllCases(): Promise<YouTubeCase[]> {
 
           resolve(cases);
         },
-        error: (error) => {
+        error: (error: Error) => {
           reject(new Error(`Failed to parse CSV: ${error.message}`));
         }
       });

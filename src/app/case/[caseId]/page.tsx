@@ -73,7 +73,7 @@ function getAppealStatusLabel(status: YouTubeCase['appealStatus']): string {
     case 'PENDING':
       return 'Pending review';
     default:
-      return status.replace(/_/g, ' ');
+      return String(status).replace(/_/g, ' ');
   }
 }
 

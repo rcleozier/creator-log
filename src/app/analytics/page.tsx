@@ -239,7 +239,7 @@ export default function AnalyticsPage() {
                   cx="50%"
                   cy="50%"
                   labelLine={false}
-                  label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                  label={({ name, percent }) => `${name}: ${((percent || 0) * 100).toFixed(0)}%`}
                   outerRadius={100}
                   fill="#8884d8"
                   dataKey="value"
@@ -270,7 +270,7 @@ export default function AnalyticsPage() {
                   cx="50%"
                   cy="50%"
                   labelLine={false}
-                  label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                  label={({ name, percent }) => `${name}: ${((percent || 0) * 100).toFixed(0)}%`}
                   outerRadius={100}
                   fill="#8884d8"
                   dataKey="value"
@@ -360,7 +360,7 @@ export default function AnalyticsPage() {
                     borderRadius: '8px',
                     color: '#111827'
                   }}
-                  formatter={(value: number) => [`${value.toFixed(1)}%`, 'Reinstatement Rate']}
+                  formatter={(value: number | undefined) => [`${(value || 0).toFixed(1)}%`, 'Reinstatement Rate']}
                 />
                 <Bar dataKey="rate" fill={COLORS.green} radius={[0, 4, 4, 0]} />
               </BarChart>
