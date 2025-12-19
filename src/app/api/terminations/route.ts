@@ -39,14 +39,13 @@ export async function GET() {
       );
     }
 
-    return new Promise((resolve) => {
+    return new Promise<NextResponse>((resolve) => {
       Papa.parse(csvText, {
         header: true,
         skipEmptyLines: true,
         transformHeader: (header) => header.trim(),
         transform: (value) => typeof value === 'string' ? value.trim() : value,
         complete: (results) => {
-
           const data = results.data.map(trimObject);
           
           resolve(NextResponse.json({
