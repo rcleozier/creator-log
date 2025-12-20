@@ -7,8 +7,16 @@ import { DisclaimerBanner } from './components/DisclaimerBanner';
 
 function escapeHtml(text: string | undefined): string {
   if (!text) return '';
-  // Simple HTML escaping
-  return text
+  // First decode any existing HTML entities to prevent double-escaping
+  const decoded = text
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#039;/g, "'")
+    .replace(/&#39;/g, "'");
+  // Then escape for safe display
+  return decoded
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')

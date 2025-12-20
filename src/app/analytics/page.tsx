@@ -148,18 +148,6 @@ export default function AnalyticsPage() {
       Denied: data.denied,
     }));
 
-  // Niche/Category Distribution
-  const nicheData = cases.reduce((acc, c) => {
-    const niche = c.niche || c.category || 'Unknown';
-    acc[niche] = (acc[niche] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
-
-  const nicheChart = Object.entries(nicheData)
-    .map(([name, value]) => ({ name, value }))
-    .sort((a, b) => b.value - a.value)
-    .slice(0, 10);
-
   // Subscriber Count Distribution (buckets)
   const subscriberBuckets = cases
     .filter(c => c.subscriberCount && c.subscriberCount > 0)
@@ -343,6 +331,72 @@ export default function AnalyticsPage() {
     c.appealStatus === 'PENDING' || c.appealStatus === 'UNDER_REVIEW'
   ).length;
 
+  // Monetization Status Distribution
+  const monetizationData = cases
+    .filter(c => c.monetized !== undefined)
+    .reduce((acc, c) => {
+      let status = 'Unknown';
+      if (typeof c.monetized === 'boolean') {
+        status = c.monetized ? 'Yes' : 'No';
+      } else if (typeof c.monetized === 'string') {
+        const lower = c.monetized.toLowerCase().trim();
+        if (lower.includes('yes') || lower === 'true' || lower === '1' || lower === 'y') {
+          status = 'Yes';
+        } else if (lower.includes('no') || lower === 'false' || lower === '0' || lower === 'n') {
+          status = 'No';
+        } else {
+          status = c.monetized;
+        }
+      }
+      acc[status] = (acc[status] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+
+  const monetizationChart = Object.entries(monetizationData)
+    .map(([name, value]) => ({ name, value }))
+    .sort((a, b) => b.value - a.value);
+
+  // Reinstatement Rate by Monetization Status
+  const monetizationReinstatement = cases
+    .filter(c => c.monetized !== undefined)
+    .reduce((acc, c) => {
+      let status = 'Unknown';
+      if (typeof c.monetized === 'boolean') {
+        status = c.monetized ? 'Yes' : 'No';
+      } else if (typeof c.monetized === 'string') {
+        const lower = c.monetized.toLowerCase().trim();
+        if (lower.includes('yes') || lower === 'true' || lower === '1' || lower === 'y') {
+          status = 'Yes';
+        } else if (lower.includes('no') || lower === 'false' || lower === '0' || lower === 'n') {
+          status = 'No';
+        } else {
+          status = 'Other';
+        }
+      }
+      if (!acc[status]) {
+        acc[status] = { total: 0, reinstated: 0 };
+      }
+      acc[status].total++;
+      if (c.status === 'REINSTATED') {
+        acc[status].reinstated++;
+      }
+      return acc;
+    }, {} as Record<string, { total: number; reinstated: number }>);
+
+  const monetizationReinstatementChart = Object.entries(monetizationReinstatement)
+    .filter(([, data]) => data.total >= 2) // Only show if 2+ cases
+    .map(([name, data]) => ({
+      name,
+      rate: data.total > 0 ? (data.reinstated / data.total) * 100 : 0,
+      total: data.total,
+    }))
+    .sort((a, b) => {
+      // Sort: Yes, No, Other
+      const order = ['Yes', 'No', 'Other'];
+      return (order.indexOf(a.name) === -1 ? 999 : order.indexOf(a.name)) - 
+             (order.indexOf(b.name) === -1 ? 999 : order.indexOf(b.name));
+    });
+
   if (loading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
@@ -524,36 +578,7 @@ export default function AnalyticsPage() {
             </ResponsiveContainer>
           </div>
 
-          {/* Chart 5: Niche/Category Distribution */}
-          {nicheChart.length > 0 && (
-            <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6 shadow-sm">
-              <h3 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Content Type Distribution</h3>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={nicheChart}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                  <XAxis 
-                    dataKey="name" 
-                    angle={-45}
-                    textAnchor="end"
-                    height={100}
-                    tick={{ fill: '#6B7280', fontSize: 12 }}
-                  />
-                  <YAxis tick={{ fill: '#9CA3AF' }} />
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: '#ffffff', 
-                      border: '1px solid #e5e7eb',
-                      borderRadius: '8px',
-                      color: '#111827'
-                    }}
-                  />
-                  <Bar dataKey="value" fill={COLORS.purple} radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          )}
-
-          {/* Chart 6: Subscriber Count Distribution */}
+          {/* Chart 5: Subscriber Count Distribution */}
           {subscriberChart.length > 0 && (
             <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6 shadow-sm">
               <h3 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Subscriber Count Distribution</h3>
@@ -576,7 +601,7 @@ export default function AnalyticsPage() {
             </div>
           )}
 
-          {/* Chart 7: Termination Dates Over Time */}
+          {/* Chart 6: Termination Dates Over Time */}
           {terminationDateChart.length > 0 && (
             <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6 shadow-sm">
               <h3 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Terminations Over Time</h3>
@@ -599,7 +624,7 @@ export default function AnalyticsPage() {
             </div>
           )}
 
-          {/* Chart 8: Days Terminated Distribution */}
+          {/* Chart 7: Days Terminated Distribution */}
           {daysTerminatedChart.length > 0 && (
             <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6 shadow-sm">
               <h3 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Duration of Terminations</h3>
@@ -622,7 +647,7 @@ export default function AnalyticsPage() {
             </div>
           )}
 
-          {/* Chart 9: Reinstatement Rate by Subscriber Count */}
+          {/* Chart 8: Reinstatement Rate by Subscriber Count */}
           {subscriberReinstatementChart.length > 0 && (
             <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6 shadow-sm">
               <h3 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Reinstatement Rate by Channel Size</h3>
@@ -650,7 +675,68 @@ export default function AnalyticsPage() {
             </div>
           )}
 
-          {/* Chart 10: Appeal Outcome Timeline */}
+          {/* Chart 9: Monetization Status Distribution */}
+          {monetizationChart.length > 0 && (
+            <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6 shadow-sm">
+              <h3 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Monetization Status</h3>
+              <ResponsiveContainer width="100%" height={300}>
+                <PieChart>
+                  <Pie
+                    data={monetizationChart}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    label={({ name, percent }) => `${name}: ${((percent || 0) * 100).toFixed(0)}%`}
+                    outerRadius={100}
+                    fill="#8884d8"
+                    dataKey="value"
+                  >
+                    {monetizationChart.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={Object.values(COLORS)[index % Object.keys(COLORS).length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip 
+                    contentStyle={{ 
+                      backgroundColor: '#ffffff', 
+                      border: '1px solid #e5e7eb',
+                      borderRadius: '8px',
+                      color: '#111827'
+                    }}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          )}
+
+          {/* Chart 10: Reinstatement Rate by Monetization Status */}
+          {monetizationReinstatementChart.length > 0 && (
+            <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6 shadow-sm">
+              <h3 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Reinstatement Rate by Monetization Status</h3>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={monetizationReinstatementChart}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                  <XAxis dataKey="name" tick={{ fill: '#9CA3AF' }} />
+                  <YAxis 
+                    domain={[0, 100]} 
+                    tick={{ fill: '#9CA3AF' }}
+                    label={{ value: 'Reinstatement Rate (%)', angle: -90, position: 'insideLeft' }}
+                  />
+                  <Tooltip 
+                    contentStyle={{ 
+                      backgroundColor: '#ffffff', 
+                      border: '1px solid #e5e7eb',
+                      borderRadius: '8px',
+                      color: '#111827'
+                    }}
+                    formatter={(value: number | undefined) => [`${(value || 0).toFixed(1)}%`, 'Reinstatement Rate']}
+                  />
+                  <Bar dataKey="rate" fill={COLORS.green} radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          )}
+
+          {/* Chart 11: Appeal Outcome Timeline */}
           {outcomeTimelineChart.length > 0 && (
             <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6 shadow-sm">
               <h3 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Appeal Outcomes Over Time</h3>

@@ -120,6 +120,9 @@ export default function AboutPage() {
                 Every effort has been made to review and filter submissions for plausibility, but due to the volume 
                 and complexity of cases, we cannot guarantee the veracity of all submissions.
               </p>
+              <p className="mt-4 leading-relaxed font-semibold">
+                Cases are reviewed for plausibility and completeness before publication; inclusion does not imply wrongdoing by any platform or verification of claims.
+              </p>
               <p className="mt-4 leading-relaxed">
                 This tracker displays community-reported claims that have <strong>not been verified</strong> by 
                 YouTube or any official source. The information presented here is for transparency and 

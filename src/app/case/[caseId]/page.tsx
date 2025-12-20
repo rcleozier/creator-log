@@ -9,8 +9,16 @@ import { ShareButtons } from '@/app/components/ShareButtons';
 
 function escapeHtml(text: string | undefined): string {
   if (!text) return '';
-  // Simple HTML escaping
-  return text
+  // First decode any existing HTML entities to prevent double-escaping
+  const decoded = text
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#039;/g, "'")
+    .replace(/&#39;/g, "'");
+  // Then escape for safe display
+  return decoded
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
@@ -371,16 +379,50 @@ export default function CasePage() {
             </div>
           )}
 
-          <div className="bg-white rounded-xl border-2 border-gray-200 p-6 shadow-md hover:shadow-lg transition-shadow">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          {caseData.monetized !== undefined && (
+            <div className="bg-white rounded-lg sm:rounded-xl border-2 border-gray-200 p-4 sm:p-6 shadow-md hover:shadow-lg transition-shadow">
+              <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
+                <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center ${
+                  (typeof caseData.monetized === 'boolean' && caseData.monetized) || 
+                  (typeof caseData.monetized === 'string' && caseData.monetized.toLowerCase().includes('yes'))
+                    ? 'bg-green-100' 
+                    : 'bg-gray-100'
+                }`}>
+                  <svg className={`w-4 h-4 sm:w-5 sm:h-5 ${
+                    (typeof caseData.monetized === 'boolean' && caseData.monetized) || 
+                    (typeof caseData.monetized === 'string' && caseData.monetized.toLowerCase().includes('yes'))
+                      ? 'text-green-600' 
+                      : 'text-gray-600'
+                  }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <h3 className="text-gray-600 text-xs sm:text-sm font-semibold uppercase tracking-wide">Monetized</h3>
+              </div>
+              <p className={`text-lg sm:text-xl font-bold ${
+                (typeof caseData.monetized === 'boolean' && caseData.monetized) || 
+                (typeof caseData.monetized === 'string' && caseData.monetized.toLowerCase().includes('yes'))
+                  ? 'text-green-600' 
+                  : 'text-gray-600'
+              }`}>
+                {typeof caseData.monetized === 'boolean' 
+                  ? (caseData.monetized ? 'Yes' : 'No')
+                  : escapeHtml(String(caseData.monetized))
+                }
+              </p>
+            </div>
+          )}
+
+          <div className="bg-white rounded-lg sm:rounded-xl border-2 border-gray-200 p-4 sm:p-6 shadow-md hover:shadow-lg transition-shadow">
+            <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                <svg className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <h3 className="text-gray-600 text-sm font-semibold uppercase tracking-wide">Submitted</h3>
+              <h3 className="text-gray-600 text-xs sm:text-sm font-semibold uppercase tracking-wide">Submitted Date</h3>
             </div>
-            <p className="text-lg font-bold text-gray-900">
+            <p className="text-lg sm:text-xl font-bold text-gray-900">
               {new Date(caseData.submittedDate).toLocaleDateString('en-US', {
                 year: 'numeric',
                 month: 'long',

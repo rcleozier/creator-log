@@ -187,6 +187,14 @@ async function fetchFromGoogleSheet(): Promise<YouTubeCase[]> {
               })(),
               category: findField(['category', 'type']),
               niche: findField(['niche', 'niche/content type', 'niche/contenttype', 'content type', 'contenttype']),
+              monetized: (() => {
+                const monetizedValue = findField(['monetized', 'monetization', 'monetisation']);
+                if (!monetizedValue) return undefined;
+                const lower = monetizedValue.toLowerCase().trim();
+                if (lower === 'yes' || lower === 'true' || lower === '1' || lower === 'y') return true;
+                if (lower === 'no' || lower === 'false' || lower === '0' || lower === 'n') return false;
+                return monetizedValue; // Return as string if not clearly boolean
+              })(),
             };
 
             cases.push(caseItem);

@@ -13,6 +13,7 @@ export interface YouTubeCase {
   subscriberCount?: number;
   category?: string;
   niche?: string;
+  monetized?: boolean | string; // Can be boolean or string like "Yes"/"No"
 }
 
 export interface CaseStats {
