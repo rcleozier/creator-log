@@ -13,7 +13,7 @@ function trimObject(obj: Record<string, any>): Record<string, any> {
   return trimmed;
 }
 
-export async function GET() {
+export async function GET(): Promise<NextResponse> {
   try {
     const response = await fetch(CSV_URL, {
       next: { revalidate: 60 } // Cache and revalidate every 60 seconds

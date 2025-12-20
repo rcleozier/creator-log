@@ -272,15 +272,7 @@ export default function CasePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  useEffect(() => {
-    document.title = 'Case Details - Open Creator Log';
-  }, []);
-
-  useEffect(() => {
-    if (caseData) {
-      document.title = `${caseData.channelName} - Open Creator Log`;
-    }
-  }, [caseData]);
+  // Metadata is now handled by layout.tsx generateMetadata function
 
   useEffect(() => {
     async function fetchCase() {
