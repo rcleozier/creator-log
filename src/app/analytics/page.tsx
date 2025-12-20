@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { DisclaimerBanner } from '@/app/components/DisclaimerBanner';
+import { Footer } from '@/app/components/Footer';
+import { Navigation } from '@/app/components/Navigation';
 import {
   PieChart,
   Pie,
@@ -421,40 +423,7 @@ export default function AnalyticsPage() {
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900">
       <DisclaimerBanner />
-
-      {/* Header */}
-      <header className="border-b border-gray-200 bg-white sticky top-0 z-50 shadow-sm">
-        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-3 sm:py-4">
-          <div className="flex items-center justify-between flex-wrap gap-3 sm:gap-4">
-            <div className="flex items-center gap-2 sm:gap-3">
-              <div className="w-7 h-7 sm:w-8 sm:h-8 bg-red-600 rounded-lg flex items-center justify-center font-bold text-xs sm:text-sm text-white">
-                ▶
-              </div>
-              <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Open Creator Log</h1>
-            </div>
-            <nav className="flex items-center gap-2 sm:gap-4 flex-wrap text-sm sm:text-base">
-              <Link href="/" className="text-gray-600 hover:text-gray-900 transition-colors">
-                Home
-              </Link>
-              <Link href="/terminations" className="text-gray-600 hover:text-gray-900 transition-colors">
-                Terminations
-              </Link>
-              <Link href="/analytics" className="text-gray-900 font-semibold">
-                Analytics
-              </Link>
-              <Link href="/about" className="text-gray-600 hover:text-gray-900 transition-colors">
-                About
-              </Link>
-              <Link 
-                href="/submit"
-                className="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg font-semibold transition-colors"
-              >
-                Submit Your Case
-              </Link>
-            </nav>
-          </div>
-        </div>
-      </header>
+      <Navigation />
 
       {/* Main Content */}
       <main className="max-w-[1400px] mx-auto px-4 sm:px-6 py-6 sm:py-8">
@@ -469,7 +438,7 @@ export default function AnalyticsPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
           {/* Chart 1: Appeal Status Distribution */}
           <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6 shadow-sm">
-            <h3 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Appeal Status Distribution</h3>
+            <h3 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Appeal Status Distribution (Reported)</h3>
             <ResponsiveContainer width="100%" height={300}>
               <PieChart>
                 <Pie
@@ -500,7 +469,7 @@ export default function AnalyticsPage() {
 
           {/* Chart 2: Channel Status Distribution */}
           <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6 shadow-sm">
-            <h3 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Channel Status Distribution</h3>
+            <h3 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Current Status Distribution (Reported)</h3>
             <ResponsiveContainer width="100%" height={300}>
               <PieChart>
                 <Pie
@@ -531,7 +500,7 @@ export default function AnalyticsPage() {
 
           {/* Chart 3: Top Termination Reasons */}
           <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6 shadow-sm">
-            <h3 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Top Termination Reasons</h3>
+            <h3 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Reported Reasons (Normalized)</h3>
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={reasonsChart}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
@@ -558,7 +527,7 @@ export default function AnalyticsPage() {
 
           {/* Chart 4: Reinstatement Rate by Reason */}
           <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6 shadow-sm">
-            <h3 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Reinstatement Rate by Reason</h3>
+            <h3 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Reported Reinstatement Rate by Reason</h3>
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={reinstatementRateChart} layout="vertical">
                 <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
@@ -604,7 +573,7 @@ export default function AnalyticsPage() {
           {/* Chart 6: Termination Dates Over Time */}
           {terminationDateChart.length > 0 && (
             <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6 shadow-sm">
-              <h3 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Terminations Over Time</h3>
+              <h3 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Reported Terminations Over Time</h3>
               <ResponsiveContainer width="100%" height={300}>
                 <LineChart data={terminationDateChart}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
@@ -650,7 +619,7 @@ export default function AnalyticsPage() {
           {/* Chart 8: Reinstatement Rate by Subscriber Count */}
           {subscriberReinstatementChart.length > 0 && (
             <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6 shadow-sm">
-              <h3 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Reinstatement Rate by Channel Size</h3>
+              <h3 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Reported Reinstatement Rate by Channel Size</h3>
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={subscriberReinstatementChart}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
@@ -658,7 +627,7 @@ export default function AnalyticsPage() {
                   <YAxis 
                     domain={[0, 100]} 
                     tick={{ fill: '#9CA3AF' }}
-                    label={{ value: 'Reinstatement Rate (%)', angle: -90, position: 'insideLeft' }}
+                    label={{ value: 'Reported Reinstatement Rate (%)', angle: -90, position: 'insideLeft' }}
                   />
                   <Tooltip 
                     contentStyle={{ 
@@ -667,7 +636,7 @@ export default function AnalyticsPage() {
                       borderRadius: '8px',
                       color: '#111827'
                     }}
-                    formatter={(value: number | undefined) => [`${(value || 0).toFixed(1)}%`, 'Reinstatement Rate']}
+                    formatter={(value: number | undefined) => [`${(value || 0).toFixed(1)}%`, 'Reported Reinstatement Rate']}
                   />
                   <Bar dataKey="rate" fill={COLORS.green} radius={[4, 4, 0, 0]} />
                 </BarChart>
@@ -678,7 +647,7 @@ export default function AnalyticsPage() {
           {/* Chart 9: Monetization Status Distribution */}
           {monetizationChart.length > 0 && (
             <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6 shadow-sm">
-              <h3 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Monetization Status</h3>
+              <h3 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Monetization Status (Reported)</h3>
               <ResponsiveContainer width="100%" height={300}>
                 <PieChart>
                   <Pie
@@ -711,7 +680,7 @@ export default function AnalyticsPage() {
           {/* Chart 10: Reinstatement Rate by Monetization Status */}
           {monetizationReinstatementChart.length > 0 && (
             <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6 shadow-sm">
-              <h3 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Reinstatement Rate by Monetization Status</h3>
+              <h3 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Reported Reinstatement Rate by Monetization Status</h3>
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={monetizationReinstatementChart}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
@@ -719,7 +688,7 @@ export default function AnalyticsPage() {
                   <YAxis 
                     domain={[0, 100]} 
                     tick={{ fill: '#9CA3AF' }}
-                    label={{ value: 'Reinstatement Rate (%)', angle: -90, position: 'insideLeft' }}
+                    label={{ value: 'Reported Reinstatement Rate (%)', angle: -90, position: 'insideLeft' }}
                   />
                   <Tooltip 
                     contentStyle={{ 
@@ -728,7 +697,7 @@ export default function AnalyticsPage() {
                       borderRadius: '8px',
                       color: '#111827'
                     }}
-                    formatter={(value: number | undefined) => [`${(value || 0).toFixed(1)}%`, 'Reinstatement Rate']}
+                    formatter={(value: number | undefined) => [`${(value || 0).toFixed(1)}%`, 'Reported Reinstatement Rate']}
                   />
                   <Bar dataKey="rate" fill={COLORS.green} radius={[4, 4, 0, 0]} />
                 </BarChart>
@@ -779,7 +748,7 @@ export default function AnalyticsPage() {
             <div className="text-2xl sm:text-3xl font-bold text-gray-900">{cases.length}</div>
           </div>
           <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6 shadow-sm">
-            <div className="text-gray-600 text-xs sm:text-sm mb-1 sm:mb-2">Reinstatement Rate</div>
+            <div className="text-gray-600 text-xs sm:text-sm mb-1 sm:mb-2">Reported Reinstatement Rate</div>
             <div className="text-2xl sm:text-3xl font-bold text-green-600">
               {cases.length > 0 
                 ? `${((cases.filter(c => c.status === 'REINSTATED').length / cases.length) * 100).toFixed(1)}%`
@@ -819,17 +788,7 @@ export default function AnalyticsPage() {
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-gray-200 mt-20 py-12 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="text-gray-600 text-sm space-y-2">
-            <p>Tracking YouTube channel appeals and enforcement actions for transparency</p>
-            <p className="text-xs text-gray-500 mt-4">
-              Community-reported claims; not verified by YouTube or any official source
-            </p>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

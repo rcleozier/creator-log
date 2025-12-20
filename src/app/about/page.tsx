@@ -3,6 +3,8 @@
 import { useEffect } from 'react';
 import Link from 'next/link';
 import { DisclaimerBanner } from '@/app/components/DisclaimerBanner';
+import { Footer } from '@/app/components/Footer';
+import { Navigation } from '@/app/components/Navigation';
 
 export default function AboutPage() {
   useEffect(() => {
@@ -12,37 +14,7 @@ export default function AboutPage() {
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900">
       <DisclaimerBanner />
-
-      {/* Header */}
-      <header className="border-b border-gray-200 bg-white sticky top-0 z-50 shadow-sm">
-        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-3 sm:py-4">
-          <div className="flex items-center justify-between flex-wrap gap-3 sm:gap-4">
-            <div className="flex items-center gap-2 sm:gap-3">
-              <div className="w-7 h-7 sm:w-8 sm:h-8 bg-red-600 rounded-lg flex items-center justify-center font-bold text-xs sm:text-sm text-white">
-                ▶
-              </div>
-              <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Open Creator Log</h1>
-            </div>
-            <nav className="flex items-center gap-2 sm:gap-4 flex-wrap text-sm sm:text-base">
-              <Link href="/" className="text-gray-600 hover:text-gray-900 transition-colors">
-                Home
-              </Link>
-              <Link href="/terminations" className="text-gray-600 hover:text-gray-900 transition-colors">
-                Terminations
-              </Link>
-              <Link href="/analytics" className="text-gray-600 hover:text-gray-900 transition-colors">
-                Analytics
-              </Link>
-              <Link 
-                href="/submit"
-                className="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg font-semibold transition-colors"
-              >
-                Submit Your Case
-              </Link>
-            </nav>
-          </div>
-        </div>
-      </header>
+      <Navigation />
 
       {/* Main Content */}
       <main className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
@@ -184,17 +156,7 @@ export default function AboutPage() {
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-gray-200 mt-20 py-12 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="text-gray-600 text-sm space-y-2">
-            <p>Tracking YouTube channel appeals and enforcement actions for transparency</p>
-            <p className="text-xs text-gray-500 mt-4">
-              Community-reported claims; not verified by YouTube or any official source
-            </p>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

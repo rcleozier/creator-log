@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { YouTubeCase, CaseStats } from '@/types/case';
 import { DisclaimerBanner } from './components/DisclaimerBanner';
+import { Footer } from './components/Footer';
+import { Navigation } from './components/Navigation';
 
 function escapeHtml(text: string | undefined): string {
   if (!text) return '';
@@ -171,40 +173,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900">
       <DisclaimerBanner />
-
-      {/* Header */}
-      <header className="border-b border-gray-200 bg-white sticky top-0 z-50 shadow-sm">
-        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-3 sm:py-4">
-          <div className="flex items-center justify-between flex-wrap gap-3 sm:gap-4">
-            <div className="flex items-center gap-2 sm:gap-3">
-              <div className="w-7 h-7 sm:w-8 sm:h-8 bg-red-600 rounded-lg flex items-center justify-center font-bold text-xs sm:text-sm text-white">
-                ▶
-              </div>
-              <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Open Creator Log</h1>
-            </div>
-            <nav className="flex items-center gap-2 sm:gap-4 flex-wrap text-sm sm:text-base">
-              <Link href="/" className="text-gray-600 hover:text-gray-900 transition-colors">
-                Home
-              </Link>
-              <Link href="/terminations" className="text-gray-600 hover:text-gray-900 transition-colors">
-                Terminations
-              </Link>
-              <Link href="/analytics" className="text-gray-600 hover:text-gray-900 transition-colors">
-                Analytics
-              </Link>
-              <Link href="/about" className="text-gray-600 hover:text-gray-900 transition-colors">
-                About
-              </Link>
-              <Link 
-                href="/submit"
-                className="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg font-semibold transition-colors text-sm sm:text-base"
-              >
-                Submit Your Case
-              </Link>
-            </nav>
-          </div>
-        </div>
-      </header>
+      <Navigation />
 
       {/* Main Content */}
       <main className="max-w-[1400px] mx-auto px-4 sm:px-6 py-6 sm:py-8">
@@ -349,7 +318,7 @@ export default function Home() {
                         </span>
                       </div>
                       <p className="text-sm sm:text-base text-gray-600 mb-2">
-                        <span className="font-semibold">Reason:</span> {escapeHtml(caseItem.reason)}
+                        <span className="font-semibold">Reason given (reported):</span> {escapeHtml(caseItem.reason)}
                       </p>
                       {caseItem.description && (
                         <p className="text-gray-500 text-xs sm:text-sm line-clamp-2">{escapeHtml(caseItem.description)}</p>
@@ -357,7 +326,7 @@ export default function Home() {
                     </div>
                     <div className="flex flex-row sm:flex-col items-start sm:items-end gap-2 flex-shrink-0">
                       <div className={`text-xs sm:text-sm font-medium ${getAppealStatusColor(caseItem.appealStatus)}`}>
-                        {getAppealStatusLabel(caseItem.appealStatus)}
+                        Appeal outcome (reported): {getAppealStatusLabel(caseItem.appealStatus)}
                       </div>
                       {caseItem.subscriberCount && (
                         <div className="text-xs text-gray-500">
@@ -373,17 +342,7 @@ export default function Home() {
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-gray-200 mt-20 py-12 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="text-gray-600 text-sm space-y-2">
-            <p>Tracking YouTube channel appeals and enforcement actions for transparency</p>
-            <p className="text-xs text-gray-500 mt-4">
-              Community-reported claims; not verified by YouTube or any official source
-            </p>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

@@ -6,6 +6,8 @@ import Link from 'next/link';
 import { YouTubeCase } from '@/types/case';
 import { DisclaimerBanner } from '@/app/components/DisclaimerBanner';
 import { ShareButtons } from '@/app/components/ShareButtons';
+import { Footer } from '@/app/components/Footer';
+import { Navigation } from '@/app/components/Navigation';
 
 function escapeHtml(text: string | undefined): string {
   if (!text) return '';
@@ -208,40 +210,7 @@ export default function CasePage() {
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900">
       <DisclaimerBanner />
-
-      {/* Header */}
-      <header className="border-b border-gray-200 bg-white sticky top-0 z-50 shadow-sm">
-        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-3 sm:py-4">
-          <div className="flex items-center justify-between flex-wrap gap-3 sm:gap-4">
-            <Link href="/" className="flex items-center gap-2 sm:gap-3 hover:opacity-80 transition-opacity">
-              <div className="w-7 h-7 sm:w-8 sm:h-8 bg-red-600 rounded-lg flex items-center justify-center font-bold text-xs sm:text-sm text-white">
-                ▶
-              </div>
-              <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Open Creator Log</h1>
-            </Link>
-            <nav className="flex items-center gap-2 sm:gap-4 flex-wrap text-sm sm:text-base">
-              <Link href="/" className="text-gray-600 hover:text-gray-900 transition-colors">
-                Home
-              </Link>
-              <Link href="/terminations" className="text-gray-600 hover:text-gray-900 transition-colors">
-                Terminations
-              </Link>
-              <Link href="/analytics" className="text-gray-600 hover:text-gray-900 transition-colors">
-                Analytics
-              </Link>
-              <Link href="/about" className="text-gray-600 hover:text-gray-900 transition-colors">
-                About
-              </Link>
-              <Link 
-                href="/submit"
-                className="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg font-semibold transition-colors"
-              >
-                Submit Your Case
-              </Link>
-            </nav>
-          </div>
-        </div>
-      </header>
+      <Navigation />
 
       {/* Main Content */}
       <main className="max-w-[1400px] mx-auto px-4 sm:px-6 py-6 sm:py-8">
@@ -274,8 +243,8 @@ export default function CasePage() {
                   rel="noopener noreferrer"
                   className="group inline-flex items-center justify-center gap-2 sm:gap-3 px-4 sm:px-6 py-2.5 sm:py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg sm:rounded-xl font-semibold transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5 text-sm sm:text-base"
                 >
-                  <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                  <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
                   </svg>
                   <span>Visit YouTube Channel</span>
                   <svg className="w-3 h-3 sm:w-4 sm:h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -318,7 +287,7 @@ export default function CasePage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
               </div>
-              <h3 className="text-gray-600 text-xs sm:text-sm font-semibold uppercase tracking-wide">Reason Given</h3>
+              <h3 className="text-gray-600 text-xs sm:text-sm font-semibold uppercase tracking-wide">Reason Given (Reported)</h3>
             </div>
             <p className="text-lg sm:text-xl font-bold text-gray-900">{escapeHtml(caseData.reason)}</p>
           </div>
@@ -460,13 +429,16 @@ export default function CasePage() {
                 ✍️
               </div>
               <div className="flex-1">
-                <h2 className="text-2xl sm:text-3xl font-bold mb-2 text-gray-900">Creator's Story</h2>
+                <h2 className="text-2xl sm:text-3xl font-bold mb-2 text-gray-900">Creator Statement (Reported)</h2>
                 <p className="text-gray-600 text-sm">In their own words</p>
               </div>
             </div>
             <div className="prose prose-lg max-w-none">
               <p className="text-gray-800 leading-relaxed text-lg whitespace-pre-wrap bg-gray-50 p-6 rounded-lg border-l-4 border-red-500">
-                {escapeHtml(caseData.description)}
+                {escapeHtml(caseData.description?.substring(0, 1000) || '')}
+                {caseData.description && caseData.description.length > 1000 && (
+                  <span className="text-gray-500 italic">... (truncated)</span>
+                )}
               </p>
             </div>
           </div>
@@ -478,6 +450,9 @@ export default function CasePage() {
             <div className="text-xl sm:text-2xl flex-shrink-0">⚠️</div>
             <div className="min-w-0">
               <h4 className="font-semibold text-yellow-700 mb-1 text-sm sm:text-base">Disclaimer</h4>
+              <p className="text-xs sm:text-sm text-gray-700 mb-2">
+                This is a community-submitted record. Treat as unverified unless stated otherwise.
+              </p>
               <p className="text-xs sm:text-sm text-gray-700">
                 This case information is community-reported and has not been verified by YouTube or any official source. 
                 The information presented here is for transparency and informational purposes only.
@@ -487,17 +462,7 @@ export default function CasePage() {
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-gray-200 mt-20 py-12 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="text-gray-600 text-sm space-y-2">
-            <p>Tracking YouTube channel appeals and enforcement actions for transparency</p>
-            <p className="text-xs text-gray-500 mt-4">
-              Community-reported claims; not verified by YouTube or any official source
-            </p>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }
