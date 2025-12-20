@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import Link from 'next/link';
 import { DisclaimerBanner } from '@/app/components/DisclaimerBanner';
 
@@ -7,21 +8,25 @@ import { DisclaimerBanner } from '@/app/components/DisclaimerBanner';
 const GOOGLE_FORM_URL = process.env.NEXT_PUBLIC_GOOGLE_FORM_URL || 'https://docs.google.com/forms/d/e/1FAIpQLSfoVwmHJyBCKI7ZScANz838kX6c5mthhUdiycbva_9_PIp97w/viewform?usp=dialog';
 
 export default function SubmitPage() {
+  useEffect(() => {
+    document.title = 'Submit a Case - Open Creator Log';
+  }, []);
+
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900">
       <DisclaimerBanner />
 
       {/* Header */}
       <header className="border-b border-gray-200 bg-white sticky top-0 z-50 shadow-sm">
-        <div className="max-w-[1400px] mx-auto px-6 py-4">
-          <div className="flex items-center justify-between flex-wrap gap-4">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-red-600 rounded-lg flex items-center justify-center font-bold text-sm text-white">
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-3 sm:py-4">
+          <div className="flex items-center justify-between flex-wrap gap-3 sm:gap-4">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="w-7 h-7 sm:w-8 sm:h-8 bg-red-600 rounded-lg flex items-center justify-center font-bold text-xs sm:text-sm text-white">
                 ▶
               </div>
-              <h1 className="text-2xl font-bold text-gray-900">Creator Visibility Log</h1>
+              <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Open Creator Log</h1>
             </div>
-            <nav className="flex items-center gap-4 flex-wrap">
+            <nav className="flex items-center gap-2 sm:gap-4 flex-wrap text-sm sm:text-base">
               <Link href="/" className="text-gray-600 hover:text-gray-900 transition-colors">
                 Home
               </Link>
@@ -36,7 +41,7 @@ export default function SubmitPage() {
               </Link>
               <Link 
                 href="/submit"
-                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors"
+                className="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg font-semibold transition-colors"
               >
                 Submit Your Case
               </Link>
@@ -46,10 +51,10 @@ export default function SubmitPage() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-3xl mx-auto px-6 py-12">
-        <div className="bg-white rounded-lg border border-gray-200 p-8 md:p-12 shadow-sm">
-          <h1 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900">Submit a Case</h1>
-          <p className="text-gray-600 mb-8 text-lg">
+      <main className="max-w-3xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+        <div className="bg-white rounded-lg border border-gray-200 p-6 sm:p-8 md:p-12 shadow-sm">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4 text-gray-900">Submit a Case</h1>
+          <p className="text-sm sm:text-base md:text-lg text-gray-600 mb-6 sm:mb-8">
             Help us track YouTube channel appeals and enforcement actions. Your submission helps bring 
             transparency to the creator community.
           </p>

@@ -132,6 +132,16 @@ export default function CasePage() {
   const [error, setError] = useState('');
 
   useEffect(() => {
+    document.title = 'Case Details - Open Creator Log';
+  }, []);
+
+  useEffect(() => {
+    if (caseData) {
+      document.title = `${caseData.channelName} - Open Creator Log`;
+    }
+  }, [caseData]);
+
+  useEffect(() => {
     async function fetchCase() {
       try {
         const response = await fetch(`/api/cases/${caseId}`);
@@ -182,10 +192,10 @@ export default function CasePage() {
 
   const daysTerminated = calculateDaysTerminated(caseData.terminationDate);
   const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
-  const shareTitle = `${caseData.channelName} - Creator Visibility Log`;
+  const shareTitle = `${caseData.channelName} - Open Creator Log`;
   const shareDescription = caseData.description 
     ? `${caseData.description.substring(0, 150)}...`
-    : `Channel status: ${caseData.status}. ${caseData.reason}`;
+    : `Channel status: ${caseData.status}. ${caseData.reason} | opencreatorlog.com`;
 
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900">
@@ -193,15 +203,15 @@ export default function CasePage() {
 
       {/* Header */}
       <header className="border-b border-gray-200 bg-white sticky top-0 z-50 shadow-sm">
-        <div className="max-w-[1400px] mx-auto px-6 py-4">
-          <div className="flex items-center justify-between flex-wrap gap-4">
-            <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-              <div className="w-8 h-8 bg-red-600 rounded-lg flex items-center justify-center font-bold text-sm text-white">
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-3 sm:py-4">
+          <div className="flex items-center justify-between flex-wrap gap-3 sm:gap-4">
+            <Link href="/" className="flex items-center gap-2 sm:gap-3 hover:opacity-80 transition-opacity">
+              <div className="w-7 h-7 sm:w-8 sm:h-8 bg-red-600 rounded-lg flex items-center justify-center font-bold text-xs sm:text-sm text-white">
                 ▶
               </div>
-              <h1 className="text-2xl font-bold text-gray-900">Creator Visibility Log</h1>
+              <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Open Creator Log</h1>
             </Link>
-            <nav className="flex items-center gap-4 flex-wrap">
+            <nav className="flex items-center gap-2 sm:gap-4 flex-wrap text-sm sm:text-base">
               <Link href="/" className="text-gray-600 hover:text-gray-900 transition-colors">
                 Home
               </Link>
@@ -216,7 +226,7 @@ export default function CasePage() {
               </Link>
               <Link 
                 href="/submit"
-                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors"
+                className="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg font-semibold transition-colors"
               >
                 Submit Your Case
               </Link>
@@ -228,18 +238,18 @@ export default function CasePage() {
       {/* Main Content */}
       <main className="max-w-[1400px] mx-auto px-4 sm:px-6 py-6 sm:py-8">
         {/* Hero Section - Creator Story Focus */}
-        <div className="bg-gradient-to-br from-red-50 via-white to-blue-50 rounded-2xl border-2 border-gray-200 p-6 sm:p-8 md:p-12 mb-8 shadow-lg">
+        <div className="bg-gradient-to-br from-red-50 via-white to-blue-50 rounded-xl sm:rounded-2xl border-2 border-gray-200 p-4 sm:p-6 md:p-8 lg:p-12 mb-6 sm:mb-8 shadow-lg">
           <div className="max-w-4xl">
             {/* Creator Name & Status */}
-            <div className="mb-6">
-              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 text-gray-900 leading-tight">
+            <div className="mb-4 sm:mb-6">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4 text-gray-900 leading-tight">
                 {escapeHtml(caseData.channelName)}
               </h1>
-              <div className="flex flex-wrap items-center gap-3 mb-4">
-                <span className={`px-5 py-2.5 rounded-xl text-base font-bold border-2 ${getStatusColor(caseData.status)} shadow-sm`}>
+              <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+                <span className={`px-3 sm:px-5 py-1.5 sm:py-2.5 rounded-lg sm:rounded-xl text-sm sm:text-base font-bold border-2 ${getStatusColor(caseData.status)} shadow-sm`}>
                   {getStatusLabel(caseData.status)}
                   {daysTerminated !== null && caseData.status === 'TERMINATED' && (
-                    <span className="ml-2 text-sm font-normal">
+                    <span className="ml-2 text-xs sm:text-sm font-normal">
                       ({formatDaysTerminated(daysTerminated)})
                     </span>
                   )}
@@ -248,19 +258,19 @@ export default function CasePage() {
             </div>
 
             {/* Prominent Creator Links */}
-            <div className="flex flex-wrap gap-4 mb-6">
+            <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 mb-4 sm:mb-6">
               {caseData.channelUrl && (
                 <a
                   href={caseData.channelUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group inline-flex items-center gap-3 px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl font-semibold transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+                  className="group inline-flex items-center justify-center gap-2 sm:gap-3 px-4 sm:px-6 py-2.5 sm:py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg sm:rounded-xl font-semibold transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5 text-sm sm:text-base"
                 >
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
                   </svg>
                   <span>Visit YouTube Channel</span>
-                  <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-3 h-3 sm:w-4 sm:h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
                 </a>
@@ -270,13 +280,14 @@ export default function CasePage() {
                   href={`https://twitter.com/${caseData.twitterHandle.replace('@', '').trim()}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group inline-flex items-center gap-3 px-6 py-3 bg-[#1DA1F2] hover:bg-[#1a8cd8] text-white rounded-xl font-semibold transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+                  className="group inline-flex items-center justify-center gap-2 sm:gap-3 px-4 sm:px-6 py-2.5 sm:py-3 bg-[#1DA1F2] hover:bg-[#1a8cd8] text-white rounded-lg sm:rounded-xl font-semibold transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5 text-sm sm:text-base"
                 >
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
                   </svg>
-                  <span>View @{caseData.twitterHandle.replace('@', '').trim()} on Twitter</span>
-                  <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <span className="hidden sm:inline">View @{caseData.twitterHandle.replace('@', '').trim()} on Twitter</span>
+                  <span className="sm:hidden">View on Twitter</span>
+                  <svg className="w-3 h-3 sm:w-4 sm:h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
                 </a>
@@ -291,58 +302,58 @@ export default function CasePage() {
         </div>
 
         {/* Case Details Grid - More Visual */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-8">
-          <div className="bg-white rounded-xl border-2 border-red-200 p-6 shadow-md hover:shadow-lg transition-shadow">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
-                <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6 mb-6 sm:mb-8">
+          <div className="bg-white rounded-lg sm:rounded-xl border-2 border-red-200 p-4 sm:p-6 shadow-md hover:shadow-lg transition-shadow">
+            <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-red-100 rounded-lg flex items-center justify-center">
+                <svg className="w-4 h-4 sm:w-5 sm:h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
               </div>
-              <h3 className="text-gray-600 text-sm font-semibold uppercase tracking-wide">Reason Given</h3>
+              <h3 className="text-gray-600 text-xs sm:text-sm font-semibold uppercase tracking-wide">Reason Given</h3>
             </div>
-            <p className="text-xl font-bold text-gray-900">{escapeHtml(caseData.reason)}</p>
+            <p className="text-lg sm:text-xl font-bold text-gray-900">{escapeHtml(caseData.reason)}</p>
           </div>
 
           {caseData.subscriberCount && (
-            <div className="bg-white rounded-xl border-2 border-gray-200 p-6 shadow-md hover:shadow-lg transition-shadow">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="bg-white rounded-lg sm:rounded-xl border-2 border-gray-200 p-4 sm:p-6 shadow-md hover:shadow-lg transition-shadow">
+              <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                  <svg className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                   </svg>
                 </div>
-                <h3 className="text-gray-600 text-sm font-semibold uppercase tracking-wide">Subscribers</h3>
+                <h3 className="text-gray-600 text-xs sm:text-sm font-semibold uppercase tracking-wide">Subscribers</h3>
               </div>
-              <p className="text-3xl font-bold text-gray-900">{caseData.subscriberCount.toLocaleString()}</p>
+              <p className="text-2xl sm:text-3xl font-bold text-gray-900">{caseData.subscriberCount.toLocaleString()}</p>
             </div>
           )}
 
           {(caseData.category || caseData.niche) && (
-            <div className="bg-white rounded-xl border-2 border-gray-200 p-6 shadow-md hover:shadow-lg transition-shadow">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                  <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="bg-white rounded-lg sm:rounded-xl border-2 border-gray-200 p-4 sm:p-6 shadow-md hover:shadow-lg transition-shadow">
+              <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                  <svg className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
                   </svg>
                 </div>
-                <h3 className="text-gray-600 text-sm font-semibold uppercase tracking-wide">Content Type</h3>
+                <h3 className="text-gray-600 text-xs sm:text-sm font-semibold uppercase tracking-wide">Content Type</h3>
               </div>
-              <p className="text-xl font-bold text-gray-900">{escapeHtml(caseData.niche || caseData.category)}</p>
+              <p className="text-lg sm:text-xl font-bold text-gray-900">{escapeHtml(caseData.niche || caseData.category)}</p>
             </div>
           )}
 
           {caseData.terminationDate && (
-            <div className="bg-white rounded-xl border-2 border-gray-200 p-6 shadow-md hover:shadow-lg transition-shadow">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
-                  <svg className="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="bg-white rounded-lg sm:rounded-xl border-2 border-gray-200 p-4 sm:p-6 shadow-md hover:shadow-lg transition-shadow">
+              <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-orange-100 rounded-lg flex items-center justify-center">
+                  <svg className="w-4 h-4 sm:w-5 sm:h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
                 </div>
-                <h3 className="text-gray-600 text-sm font-semibold uppercase tracking-wide">Termination Date</h3>
+                <h3 className="text-gray-600 text-xs sm:text-sm font-semibold uppercase tracking-wide">Termination Date</h3>
               </div>
-              <p className="text-lg font-bold text-gray-900 mb-2">
+              <p className="text-base sm:text-lg font-bold text-gray-900 mb-1 sm:mb-2">
                 {caseData.terminationDate.includes('/') 
                   ? caseData.terminationDate
                   : new Date(caseData.terminationDate).toLocaleDateString('en-US', {
@@ -379,7 +390,7 @@ export default function CasePage() {
           </div>
 
           {caseData.lastUpdated && (
-            <div className="bg-white rounded-xl border-2 border-gray-200 p-6 shadow-md hover:shadow-lg transition-shadow">
+            <div className="bg-white rounded-lg sm:rounded-xl border-2 border-gray-200 p-4 sm:p-6 shadow-md hover:shadow-lg transition-shadow">
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
                   <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">

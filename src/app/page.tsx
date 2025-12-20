@@ -88,6 +88,10 @@ export default function Home() {
   });
 
   useEffect(() => {
+    document.title = 'Open Creator Log - YouTube Channel Appeal Tracker';
+  }, []);
+
+  useEffect(() => {
     async function fetchCases() {
       setLoading(true);
       try {
@@ -162,15 +166,15 @@ export default function Home() {
 
       {/* Header */}
       <header className="border-b border-gray-200 bg-white sticky top-0 z-50 shadow-sm">
-        <div className="max-w-[1400px] mx-auto px-6 py-4">
-          <div className="flex items-center justify-between flex-wrap gap-4">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-red-600 rounded-lg flex items-center justify-center font-bold text-sm text-white">
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-3 sm:py-4">
+          <div className="flex items-center justify-between flex-wrap gap-3 sm:gap-4">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="w-7 h-7 sm:w-8 sm:h-8 bg-red-600 rounded-lg flex items-center justify-center font-bold text-xs sm:text-sm text-white">
                 ▶
               </div>
-              <h1 className="text-2xl font-bold text-gray-900">Creator Visibility Log</h1>
+              <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Open Creator Log</h1>
             </div>
-            <nav className="flex items-center gap-4 flex-wrap">
+            <nav className="flex items-center gap-2 sm:gap-4 flex-wrap text-sm sm:text-base">
               <Link href="/" className="text-gray-600 hover:text-gray-900 transition-colors">
                 Home
               </Link>
@@ -185,7 +189,7 @@ export default function Home() {
               </Link>
               <Link 
                 href="/submit"
-                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors"
+                className="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg font-semibold transition-colors text-sm sm:text-base"
               >
                 Submit Your Case
               </Link>
@@ -195,26 +199,26 @@ export default function Home() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-[1400px] mx-auto px-6 py-8">
+      <main className="max-w-[1400px] mx-auto px-4 sm:px-6 py-6 sm:py-8">
         {/* Hero Section */}
-        <div className="mb-8">
-          <h2 className="text-4xl font-bold mb-3 text-gray-900">Track YouTube Channel Appeals</h2>
-          <p className="text-xl text-gray-600 mb-2">Transparency and Data for Creators</p>
-          <p className="text-gray-600 mb-6 max-w-3xl">
+        <div className="mb-6 sm:mb-8">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 sm:mb-3 text-gray-900">Track YouTube Channel Appeals</h2>
+          <p className="text-lg sm:text-xl text-gray-600 mb-2">Transparency and Data for Creators</p>
+          <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6 max-w-3xl">
             Collecting and analyzing YouTube enforcement appeals to bring clarity and accountability 
             to creators with demonetized, age-restricted, struck, or terminated channels.
           </p>
           
-          <div className="flex flex-wrap gap-4 mb-6">
+          <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 mb-6">
             <Link 
               href="/submit"
-              className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
+              className="bg-red-600 hover:bg-red-700 text-white px-5 py-2.5 sm:px-6 sm:py-3 rounded-lg font-semibold transition-colors text-center text-sm sm:text-base"
             >
               Submit Your Case
             </Link>
             <Link 
               href="/terminations"
-              className="bg-white hover:bg-gray-50 text-gray-900 px-6 py-3 rounded-lg font-semibold transition-colors border border-gray-300 shadow-sm"
+              className="bg-white hover:bg-gray-50 text-gray-900 px-5 py-2.5 sm:px-6 sm:py-3 rounded-lg font-semibold transition-colors border border-gray-300 shadow-sm text-center text-sm sm:text-base"
             >
               View Case Browser
             </Link>
@@ -222,18 +226,18 @@ export default function Home() {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          <div className="bg-white rounded-lg p-6 border border-gray-200 shadow-sm">
-            <div className="text-gray-600 text-sm mb-2">Total Cases</div>
-            <div className="text-3xl font-bold text-gray-900">{stats.totalCases}</div>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-6 sm:mb-8">
+          <div className="bg-white rounded-lg p-4 sm:p-6 border border-gray-200 shadow-sm">
+            <div className="text-gray-600 text-xs sm:text-sm mb-1 sm:mb-2">Total Cases</div>
+            <div className="text-2xl sm:text-3xl font-bold text-gray-900">{stats.totalCases}</div>
           </div>
-          <div className="bg-white rounded-lg p-6 border border-gray-200 shadow-sm">
-            <div className="text-gray-600 text-sm mb-2">Reinstated</div>
-            <div className="text-3xl font-bold text-green-600">{stats.reinstated}</div>
+          <div className="bg-white rounded-lg p-4 sm:p-6 border border-gray-200 shadow-sm">
+            <div className="text-gray-600 text-xs sm:text-sm mb-1 sm:mb-2">Reinstated</div>
+            <div className="text-2xl sm:text-3xl font-bold text-green-600">{stats.reinstated}</div>
           </div>
-          <div className="bg-white rounded-lg p-6 border border-gray-200 shadow-sm">
-            <div className="text-gray-600 text-sm mb-2">Terminated</div>
-            <div className="text-3xl font-bold text-red-600">{stats.terminated}</div>
+          <div className="bg-white rounded-lg p-4 sm:p-6 border border-gray-200 shadow-sm">
+            <div className="text-gray-600 text-xs sm:text-sm mb-1 sm:mb-2">Terminated</div>
+            <div className="text-2xl sm:text-3xl font-bold text-red-600">{stats.terminated}</div>
           </div>
         </div>
 
@@ -250,14 +254,14 @@ export default function Home() {
               placeholder="Search cases by channel name, reason, or description..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="block w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent shadow-sm"
+              className="block w-full pl-10 pr-12 py-2.5 sm:py-3 border border-gray-300 rounded-lg bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent shadow-sm text-sm sm:text-base"
             />
           </form>
 
           <div className="flex flex-wrap gap-2">
             <button
               onClick={() => setStatusFilter('ALL')}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+              className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg font-medium transition-colors text-xs sm:text-sm ${
                 statusFilter === 'ALL'
                   ? 'bg-red-600 text-white'
                   : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300 shadow-sm'
@@ -267,40 +271,40 @@ export default function Home() {
             </button>
             <button
               onClick={() => setStatusFilter('TERMINATED')}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+              className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg font-medium transition-colors text-xs sm:text-sm ${
                 statusFilter === 'TERMINATED'
                   ? 'bg-red-600 text-white'
-                  : 'bg-[#1A1F2E] text-gray-300 hover:bg-[#252D3D] border border-gray-800'
+                  : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300 shadow-sm'
               }`}
             >
               Terminated
             </button>
             <button
               onClick={() => setStatusFilter('REINSTATED')}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+              className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg font-medium transition-colors text-xs sm:text-sm ${
                 statusFilter === 'REINSTATED'
                   ? 'bg-red-600 text-white'
-                  : 'bg-[#1A1F2E] text-gray-300 hover:bg-[#252D3D] border border-gray-800'
+                  : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300 shadow-sm'
               }`}
             >
               Reinstated
             </button>
             <button
               onClick={() => setStatusFilter('DEMONETIZED')}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+              className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg font-medium transition-colors text-xs sm:text-sm ${
                 statusFilter === 'DEMONETIZED'
                   ? 'bg-red-600 text-white'
-                  : 'bg-[#1A1F2E] text-gray-300 hover:bg-[#252D3D] border border-gray-800'
+                  : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300 shadow-sm'
               }`}
             >
               Demonetized
             </button>
             <button
               onClick={() => setStatusFilter('UNDER_REVIEW')}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+              className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg font-medium transition-colors text-xs sm:text-sm ${
                 statusFilter === 'UNDER_REVIEW'
                   ? 'bg-red-600 text-white'
-                  : 'bg-[#1A1F2E] text-gray-300 hover:bg-[#252D3D] border border-gray-800'
+                  : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300 shadow-sm'
               }`}
             >
               Under Review
@@ -326,25 +330,25 @@ export default function Home() {
                 <Link
                   key={caseItem.id}
                   href={`/case/${caseItem.id}`}
-                  className="block hover:bg-gray-50 transition-colors p-6"
+                  className="block hover:bg-gray-50 transition-colors p-4 sm:p-6"
                 >
-                  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-3 mb-2">
-                        <h3 className="text-xl font-bold truncate text-gray-900">{escapeHtml(caseItem.channelName)}</h3>
-                        <span className={`px-3 py-1 rounded-lg text-xs font-semibold border ${getStatusColor(caseItem.status)}`}>
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-2">
+                        <h3 className="text-lg sm:text-xl font-bold truncate text-gray-900">{escapeHtml(caseItem.channelName)}</h3>
+                        <span className={`px-2.5 py-1 rounded-lg text-xs font-semibold border ${getStatusColor(caseItem.status)} self-start sm:self-center`}>
                           {getStatusLabel(caseItem.status)}
                         </span>
                       </div>
-                      <p className="text-gray-600 mb-2">
+                      <p className="text-sm sm:text-base text-gray-600 mb-2">
                         <span className="font-semibold">Reason:</span> {escapeHtml(caseItem.reason)}
                       </p>
                       {caseItem.description && (
-                        <p className="text-gray-500 text-sm line-clamp-2">{escapeHtml(caseItem.description)}</p>
+                        <p className="text-gray-500 text-xs sm:text-sm line-clamp-2">{escapeHtml(caseItem.description)}</p>
                       )}
                     </div>
-                    <div className="flex flex-col items-end gap-2 flex-shrink-0">
-                      <div className={`text-sm font-medium ${getAppealStatusColor(caseItem.appealStatus)}`}>
+                    <div className="flex flex-row sm:flex-col items-start sm:items-end gap-2 flex-shrink-0">
+                      <div className={`text-xs sm:text-sm font-medium ${getAppealStatusColor(caseItem.appealStatus)}`}>
                         {getAppealStatusLabel(caseItem.appealStatus)}
                       </div>
                       {caseItem.subscriberCount && (

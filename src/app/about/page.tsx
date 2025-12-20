@@ -1,24 +1,29 @@
 'use client';
 
+import { useEffect } from 'react';
 import Link from 'next/link';
 import { DisclaimerBanner } from '@/app/components/DisclaimerBanner';
 
 export default function AboutPage() {
+  useEffect(() => {
+    document.title = 'About - Open Creator Log';
+  }, []);
+
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900">
       <DisclaimerBanner />
 
       {/* Header */}
       <header className="border-b border-gray-200 bg-white sticky top-0 z-50 shadow-sm">
-        <div className="max-w-[1400px] mx-auto px-6 py-4">
-          <div className="flex items-center justify-between flex-wrap gap-4">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-red-600 rounded-lg flex items-center justify-center font-bold text-sm text-white">
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-3 sm:py-4">
+          <div className="flex items-center justify-between flex-wrap gap-3 sm:gap-4">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="w-7 h-7 sm:w-8 sm:h-8 bg-red-600 rounded-lg flex items-center justify-center font-bold text-xs sm:text-sm text-white">
                 ▶
               </div>
-              <h1 className="text-2xl font-bold text-gray-900">Creator Visibility Log</h1>
+              <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Open Creator Log</h1>
             </div>
-            <nav className="flex items-center gap-4 flex-wrap">
+            <nav className="flex items-center gap-2 sm:gap-4 flex-wrap text-sm sm:text-base">
               <Link href="/" className="text-gray-600 hover:text-gray-900 transition-colors">
                 Home
               </Link>
@@ -30,7 +35,7 @@ export default function AboutPage() {
               </Link>
               <Link 
                 href="/submit"
-                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors"
+                className="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg font-semibold transition-colors"
               >
                 Submit Your Case
               </Link>
@@ -40,9 +45,9 @@ export default function AboutPage() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-4xl mx-auto px-6 py-12">
-        <div className="bg-white rounded-lg border border-gray-200 p-8 md:p-12 shadow-sm">
-          <h1 className="text-4xl font-bold mb-6 text-gray-900">About This Tracker</h1>
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+        <div className="bg-white rounded-lg border border-gray-200 p-6 sm:p-8 md:p-12 shadow-sm">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 sm:mb-6 text-gray-900">About This Tracker</h1>
 
           <div className="prose prose-lg max-w-none text-gray-700 space-y-6">
             <div className="bg-blue-50 border-l-4 border-blue-500 p-6 my-8">

@@ -78,6 +78,10 @@ export default function TerminationsPage() {
   const [displayCount, setDisplayCount] = useState(50);
 
   useEffect(() => {
+    document.title = 'Terminations Database - Open Creator Log';
+  }, []);
+
+  useEffect(() => {
     async function fetchTerminations() {
       setLoading(true);
       try {
@@ -111,7 +115,6 @@ export default function TerminationsPage() {
         const priorityColumns = [
           'Channel Status',
           'Channel Name',
-          'Channel URL',
           'Contact',
           'Twitter Handle',
           'Termination Date',
@@ -126,9 +129,11 @@ export default function TerminationsPage() {
           )),
           ...cols.filter((col: string) => 
             col.toLowerCase() !== 'status' && // Exclude Status column
+            col.toLowerCase() !== 'status_1' && // Exclude status_1 column (internal)
             col.toLowerCase() !== 'case id' && // Exclude Case ID column
             col.toLowerCase() !== 'caseid' && // Exclude Case ID column (alternative)
             col.toLowerCase() !== 'id' && // Exclude ID column
+            col.toLowerCase() !== 'channel url' && // Exclude Channel URL column
             !priorityColumns.some(pc => 
               pc.toLowerCase() === col.toLowerCase()
             )
@@ -154,11 +159,9 @@ export default function TerminationsPage() {
       const searchLower = searchTerm.toLowerCase();
       const channelName = (row['Channel Name'] || '').toLowerCase();
       const contact = (row['Contact'] || '').toLowerCase();
-      const channelUrl = (row['Channel URL'] || '').toLowerCase();
       
       if (!channelName.includes(searchLower) && 
-          !contact.includes(searchLower) && 
-          !channelUrl.includes(searchLower)) {
+          !contact.includes(searchLower)) {
         return false;
       }
     }
@@ -204,15 +207,15 @@ export default function TerminationsPage() {
 
       {/* Header */}
       <header className="border-b border-gray-200 bg-white sticky top-0 z-50 shadow-sm">
-        <div className="max-w-[1400px] mx-auto px-6 py-4">
-          <div className="flex items-center justify-between flex-wrap gap-4">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-red-600 rounded-lg flex items-center justify-center font-bold text-sm text-white">
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-3 sm:py-4">
+          <div className="flex items-center justify-between flex-wrap gap-3 sm:gap-4">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="w-7 h-7 sm:w-8 sm:h-8 bg-red-600 rounded-lg flex items-center justify-center font-bold text-xs sm:text-sm text-white">
                 ▶
               </div>
-              <h1 className="text-2xl font-bold text-gray-900">Creator Visibility Log</h1>
+              <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Open Creator Log</h1>
             </div>
-            <nav className="flex items-center gap-4 flex-wrap">
+            <nav className="flex items-center gap-2 sm:gap-4 flex-wrap text-sm sm:text-base">
               <Link href="/" className="text-gray-600 hover:text-gray-900 transition-colors">
                 Home
               </Link>
@@ -227,7 +230,7 @@ export default function TerminationsPage() {
               </Link>
               <Link 
                 href="/submit"
-                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors"
+                className="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg font-semibold transition-colors"
               >
                 Submit Your Case
               </Link>
@@ -237,28 +240,28 @@ export default function TerminationsPage() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-[1400px] mx-auto px-6 py-8">
-        <div className="mb-6">
-          <h2 className="text-3xl font-bold mb-2">Terminations Database</h2>
-          <p className="text-gray-400 mb-6">
+      <main className="max-w-[1400px] mx-auto px-4 sm:px-6 py-6 sm:py-8">
+        <div className="mb-4 sm:mb-6">
+          <h2 className="text-2xl sm:text-3xl font-bold mb-2">Terminations Database</h2>
+          <p className="text-sm sm:text-base text-gray-400 mb-4 sm:mb-6">
             Viewing {displayedData.length} of {filteredData.length} cases
             {filteredData.length !== data.length && ` (filtered from ${data.length} total)`}
           </p>
 
           {/* Search and Filters */}
-          <div className="flex flex-col md:flex-row gap-4 mb-6">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-4 sm:mb-6">
             <div className="relative flex-1">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
               </div>
               <input
                 type="text"
-                placeholder="Search by Channel Name, Contact, or Channel URL..."
+                placeholder="Search by Channel Name or Contact..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="block w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent shadow-sm"
+                className="block w-full pl-9 sm:pl-10 pr-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent shadow-sm text-sm sm:text-base"
               />
             </div>
 
@@ -266,7 +269,7 @@ export default function TerminationsPage() {
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="px-4 py-3 border border-gray-300 rounded-lg bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent min-w-[200px] shadow-sm"
+                className="px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent w-full sm:w-auto sm:min-w-[200px] shadow-sm text-sm sm:text-base"
               >
                 <option value="ALL">All Statuses</option>
                 {statusValues.map((status) => (
@@ -294,7 +297,7 @@ export default function TerminationsPage() {
                   {columns.map((col) => (
                     <th
                       key={col}
-                      className="text-left py-4 px-6 text-sm font-semibold text-gray-400 whitespace-nowrap"
+                      className="text-left py-3 px-3 sm:py-4 sm:px-6 text-xs sm:text-sm font-semibold text-gray-400 whitespace-nowrap"
                     >
                       {col}
                     </th>
@@ -304,7 +307,7 @@ export default function TerminationsPage() {
               <tbody>
                 {displayedData.length === 0 ? (
                   <tr>
-                    <td colSpan={columns.length} className="py-8 px-6 text-center text-gray-400">
+                    <td colSpan={columns.length} className="py-6 sm:py-8 px-3 sm:px-6 text-center text-gray-400 text-sm sm:text-base">
                       No data found. {searchTerm || statusFilter !== 'ALL' ? 'Try adjusting your filters.' : ''}
                     </td>
                   </tr>
@@ -340,9 +343,9 @@ export default function TerminationsPage() {
                           const isUrlValue = isUrl(value);
 
                           return (
-                            <td key={col} className="py-4 px-6 text-sm min-w-0">
+                            <td key={col} className="py-3 px-3 sm:py-4 sm:px-6 text-xs sm:text-sm min-w-0">
                               {isStatusCol ? (
-                                <span className={`px-3 py-1 rounded-lg text-xs font-semibold border ${getStatusColor(value)}`}>
+                                <span className={`px-2 py-0.5 sm:px-3 sm:py-1 rounded-lg text-xs font-semibold border ${getStatusColor(value)}`}>
                                   {escapeHtml(value)}
                                 </span>
                               ) : isUrlValue ? (
@@ -372,10 +375,10 @@ export default function TerminationsPage() {
 
         {/* Load More Button */}
         {hasMore && (
-          <div className="mt-6 text-center">
+          <div className="mt-4 sm:mt-6 text-center">
             <button
               onClick={() => setDisplayCount(prev => prev + 50)}
-              className="bg-white hover:bg-gray-50 text-gray-900 px-6 py-3 rounded-lg font-semibold transition-colors border border-gray-300 shadow-sm"
+              className="bg-white hover:bg-gray-50 text-gray-900 px-5 py-2.5 sm:px-6 sm:py-3 rounded-lg font-semibold transition-colors border border-gray-300 shadow-sm text-sm sm:text-base"
             >
               Load More ({filteredData.length - displayCount} remaining)
             </button>
@@ -383,7 +386,7 @@ export default function TerminationsPage() {
         )}
 
         {!hasMore && displayedData.length > 0 && (
-          <div className="mt-6 text-center text-gray-400 text-sm">
+          <div className="mt-4 sm:mt-6 text-center text-gray-400 text-xs sm:text-sm">
             Showing all {displayedData.length} results
           </div>
         )}

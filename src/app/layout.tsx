@@ -14,8 +14,21 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Creator Visibility Log - YouTube Channel Appeal Tracker",
+  title: "Open Creator Log - YouTube Channel Appeal Tracker",
   description: "Tracking YouTube channel appeals and enforcement actions for transparency. Community-reported data on channel terminations, demonetizations, and reinstatements.",
+  openGraph: {
+    title: "Open Creator Log - YouTube Channel Appeal Tracker",
+    description: "Tracking YouTube channel appeals and enforcement actions for transparency.",
+    url: "https://opencreatorlog.com",
+    siteName: "Open Creator Log",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Open Creator Log - YouTube Channel Appeal Tracker",
+    description: "Tracking YouTube channel appeals and enforcement actions for transparency.",
+  },
+  metadataBase: new URL("https://opencreatorlog.com"),
 };
 
 export default function RootLayout({

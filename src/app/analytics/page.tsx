@@ -38,6 +38,10 @@ export default function AnalyticsPage() {
   const [error, setError] = useState('');
 
   useEffect(() => {
+    document.title = 'Analytics & Insights - Open Creator Log';
+  }, []);
+
+  useEffect(() => {
     async function fetchCases() {
       setLoading(true);
       try {
@@ -90,21 +94,6 @@ export default function AnalyticsPage() {
     .sort((a, b) => b.value - a.value)
     .slice(0, 10); // Top 10 reasons
 
-
-  // Cases over time (by submission date)
-  const casesOverTime = cases.reduce((acc, c) => {
-    const date = new Date(c.submittedDate);
-    const month = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-    acc[month] = (acc[month] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
-
-  const casesOverTimeChart = Object.entries(casesOverTime)
-    .sort(([a], [b]) => a.localeCompare(b))
-    .map(([name, value]) => ({
-      name: new Date(name + '-01').toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
-      cases: value,
-    }));
 
   // Reinstatement rate by reason
   const reinstatementByReason = cases.reduce((acc, c) => {
@@ -159,6 +148,201 @@ export default function AnalyticsPage() {
       Denied: data.denied,
     }));
 
+  // Niche/Category Distribution
+  const nicheData = cases.reduce((acc, c) => {
+    const niche = c.niche || c.category || 'Unknown';
+    acc[niche] = (acc[niche] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+
+  const nicheChart = Object.entries(nicheData)
+    .map(([name, value]) => ({ name, value }))
+    .sort((a, b) => b.value - a.value)
+    .slice(0, 10);
+
+  // Subscriber Count Distribution (buckets)
+  const subscriberBuckets = cases
+    .filter(c => c.subscriberCount && c.subscriberCount > 0)
+    .reduce((acc, c) => {
+      const count = c.subscriberCount!;
+      let bucket = '';
+      if (count < 1000) bucket = '< 1K';
+      else if (count < 10000) bucket = '1K - 10K';
+      else if (count < 100000) bucket = '10K - 100K';
+      else if (count < 1000000) bucket = '100K - 1M';
+      else bucket = '1M+';
+      acc[bucket] = (acc[bucket] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+
+  const subscriberChart = Object.entries(subscriberBuckets)
+    .map(([name, value]) => ({ name, value }))
+    .sort((a, b) => {
+      const order = ['< 1K', '1K - 10K', '10K - 100K', '100K - 1M', '1M+'];
+      return order.indexOf(a.name) - order.indexOf(b.name);
+    });
+
+  // Termination Date Trends
+  const terminationDateData = cases
+    .filter(c => c.terminationDate)
+    .reduce((acc, c) => {
+      try {
+        let date: Date;
+        if (c.terminationDate!.includes('/')) {
+          const [month, day, year] = c.terminationDate!.split('/').map(Number);
+          date = new Date(year, month - 1, day);
+        } else {
+          date = new Date(c.terminationDate!);
+        }
+        if (!isNaN(date.getTime())) {
+          const month = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+          acc[month] = (acc[month] || 0) + 1;
+        }
+      } catch (e) {
+        // Skip invalid dates
+      }
+      return acc;
+    }, {} as Record<string, number>);
+
+  const terminationDateChart = Object.entries(terminationDateData)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([name, value]) => ({
+      name: new Date(name + '-01').toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
+      terminations: value,
+    }));
+
+  // Days Terminated Distribution
+  const daysTerminatedData = cases
+    .filter(c => c.terminationDate && c.status === 'TERMINATED')
+    .map(c => {
+      try {
+        let date: Date;
+        if (c.terminationDate!.includes('/')) {
+          const [month, day, year] = c.terminationDate!.split('/').map(Number);
+          date = new Date(year, month - 1, day);
+        } else {
+          date = new Date(c.terminationDate!);
+        }
+        if (!isNaN(date.getTime())) {
+          const now = new Date();
+          const diffTime = now.getTime() - date.getTime();
+          const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+          return diffDays >= 0 ? diffDays : null;
+        }
+      } catch (e) {
+        // Skip invalid dates
+      }
+      return null;
+    })
+    .filter((days): days is number => days !== null)
+    .reduce((acc, days) => {
+      let bucket = '';
+      if (days < 30) bucket = '< 1 month';
+      else if (days < 90) bucket = '1-3 months';
+      else if (days < 180) bucket = '3-6 months';
+      else if (days < 365) bucket = '6-12 months';
+      else if (days < 730) bucket = '1-2 years';
+      else bucket = '2+ years';
+      acc[bucket] = (acc[bucket] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+
+  const daysTerminatedChart = Object.entries(daysTerminatedData)
+    .map(([name, value]) => ({ name, value }))
+    .sort((a, b) => {
+      const order = ['< 1 month', '1-3 months', '3-6 months', '6-12 months', '1-2 years', '2+ years'];
+      return order.indexOf(a.name) - order.indexOf(b.name);
+    });
+
+  // Appeal Status by Channel Status (Cross-tabulation)
+  const appealByStatus = cases.reduce((acc, c) => {
+    const channelStatus = c.status || 'UNKNOWN';
+    const appealStatus = c.appealStatus || 'UNKNOWN';
+    if (!acc[channelStatus]) {
+      acc[channelStatus] = {} as Record<string, number>;
+    }
+    acc[channelStatus][appealStatus] = (acc[channelStatus][appealStatus] || 0) + 1;
+    return acc;
+  }, {} as Record<string, Record<string, number>>);
+
+  const appealByStatusChart = Object.entries(appealByStatus).map(([channelStatus, appeals]) => ({
+    name: channelStatus.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+    ...Object.fromEntries(
+      Object.entries(appeals).map(([status, count]) => [
+        status.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+        count
+      ])
+    ),
+  }));
+
+  // Subscriber Count vs Reinstatement Rate
+  const subscriberReinstatement = cases
+    .filter(c => c.subscriberCount && c.subscriberCount > 0)
+    .reduce((acc, c) => {
+      const count = c.subscriberCount!;
+      let bucket = '';
+      if (count < 10000) bucket = '< 10K';
+      else if (count < 100000) bucket = '10K - 100K';
+      else if (count < 1000000) bucket = '100K - 1M';
+      else bucket = '1M+';
+      if (!acc[bucket]) {
+        acc[bucket] = { total: 0, reinstated: 0 };
+      }
+      acc[bucket].total++;
+      if (c.status === 'REINSTATED') {
+        acc[bucket].reinstated++;
+      }
+      return acc;
+    }, {} as Record<string, { total: number; reinstated: number }>);
+
+  const subscriberReinstatementChart = Object.entries(subscriberReinstatement)
+    .map(([name, data]) => ({
+      name,
+      rate: data.total > 0 ? (data.reinstated / data.total) * 100 : 0,
+      total: data.total,
+    }))
+    .sort((a, b) => {
+      const order = ['< 10K', '10K - 100K', '100K - 1M', '1M+'];
+      return order.indexOf(a.name) - order.indexOf(b.name);
+    });
+
+  // Calculate additional stats
+  const casesWithSubs = cases.filter(c => c.subscriberCount && c.subscriberCount > 0);
+  const avgSubscribers = casesWithSubs.length > 0
+    ? Math.round(casesWithSubs.reduce((sum, c) => sum + (c.subscriberCount || 0), 0) / casesWithSubs.length)
+    : 0;
+  
+  const terminatedCases = cases.filter(c => c.status === 'TERMINATED' && c.terminationDate);
+  const avgDaysTerminated = terminatedCases.length > 0
+    ? Math.round(
+        terminatedCases
+          .map(c => {
+            try {
+              let date: Date;
+              if (c.terminationDate!.includes('/')) {
+                const [month, day, year] = c.terminationDate!.split('/').map(Number);
+                date = new Date(year, month - 1, day);
+              } else {
+                date = new Date(c.terminationDate!);
+              }
+              if (!isNaN(date.getTime())) {
+                const now = new Date();
+                const diffTime = now.getTime() - date.getTime();
+                return Math.floor(diffTime / (1000 * 60 * 60 * 24));
+              }
+            } catch (e) {
+              return 0;
+            }
+            return 0;
+          })
+          .reduce((sum, days) => sum + days, 0) / terminatedCases.length
+      )
+    : 0;
+
+  const pendingAppeals = cases.filter(c => 
+    c.appealStatus === 'PENDING' || c.appealStatus === 'UNDER_REVIEW'
+  ).length;
+
   if (loading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
@@ -186,15 +370,15 @@ export default function AnalyticsPage() {
 
       {/* Header */}
       <header className="border-b border-gray-200 bg-white sticky top-0 z-50 shadow-sm">
-        <div className="max-w-[1400px] mx-auto px-6 py-4">
-          <div className="flex items-center justify-between flex-wrap gap-4">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-red-600 rounded-lg flex items-center justify-center font-bold text-sm text-white">
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-3 sm:py-4">
+          <div className="flex items-center justify-between flex-wrap gap-3 sm:gap-4">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="w-7 h-7 sm:w-8 sm:h-8 bg-red-600 rounded-lg flex items-center justify-center font-bold text-xs sm:text-sm text-white">
                 ▶
               </div>
-              <h1 className="text-2xl font-bold text-gray-900">Creator Visibility Log</h1>
+              <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Open Creator Log</h1>
             </div>
-            <nav className="flex items-center gap-4 flex-wrap">
+            <nav className="flex items-center gap-2 sm:gap-4 flex-wrap text-sm sm:text-base">
               <Link href="/" className="text-gray-600 hover:text-gray-900 transition-colors">
                 Home
               </Link>
@@ -209,7 +393,7 @@ export default function AnalyticsPage() {
               </Link>
               <Link 
                 href="/submit"
-                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors"
+                className="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg font-semibold transition-colors"
               >
                 Submit Your Case
               </Link>
@@ -219,19 +403,19 @@ export default function AnalyticsPage() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-[1400px] mx-auto px-6 py-8">
-        <div className="mb-8">
-          <h2 className="text-3xl font-bold mb-2">Analytics & Insights</h2>
-          <p className="text-gray-400">
+      <main className="max-w-[1400px] mx-auto px-4 sm:px-6 py-6 sm:py-8">
+        <div className="mb-6 sm:mb-8">
+          <h2 className="text-2xl sm:text-3xl font-bold mb-2">Analytics & Insights</h2>
+          <p className="text-sm sm:text-base text-gray-400">
             Data-driven insights from {cases.length} community-reported cases
           </p>
         </div>
 
         {/* Chart Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
           {/* Chart 1: Appeal Status Distribution */}
-          <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
-            <h3 className="text-xl font-semibold mb-4">Appeal Status Distribution</h3>
+          <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6 shadow-sm">
+            <h3 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Appeal Status Distribution</h3>
             <ResponsiveContainer width="100%" height={300}>
               <PieChart>
                 <Pie
@@ -261,8 +445,8 @@ export default function AnalyticsPage() {
           </div>
 
           {/* Chart 2: Channel Status Distribution */}
-          <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
-            <h3 className="text-xl font-semibold mb-4">Channel Status Distribution</h3>
+          <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6 shadow-sm">
+            <h3 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Channel Status Distribution</h3>
             <ResponsiveContainer width="100%" height={300}>
               <PieChart>
                 <Pie
@@ -292,8 +476,8 @@ export default function AnalyticsPage() {
           </div>
 
           {/* Chart 3: Top Termination Reasons */}
-          <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
-            <h3 className="text-xl font-semibold mb-4">Top Termination Reasons</h3>
+          <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6 shadow-sm">
+            <h3 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Top Termination Reasons</h3>
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={reasonsChart}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
@@ -318,36 +502,9 @@ export default function AnalyticsPage() {
             </ResponsiveContainer>
           </div>
 
-          {/* Chart 4: Cases Over Time */}
-          <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
-            <h3 className="text-xl font-semibold mb-4">Cases Submitted Over Time</h3>
-            <ResponsiveContainer width="100%" height={300}>
-              <AreaChart data={casesOverTimeChart}>
-                <defs>
-                  <linearGradient id="colorCases" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor={COLORS.blue} stopOpacity={0.8}/>
-                    <stop offset="95%" stopColor={COLORS.blue} stopOpacity={0}/>
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                <XAxis dataKey="name" tick={{ fill: '#9CA3AF' }} />
-                <YAxis tick={{ fill: '#9CA3AF' }} />
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: '#ffffff', 
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '8px',
-                    color: '#111827'
-                  }}
-                />
-                <Area type="monotone" dataKey="cases" stroke={COLORS.blue} fillOpacity={1} fill="url(#colorCases)" />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
-
-          {/* Chart 5: Reinstatement Rate by Reason */}
-          <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
-            <h3 className="text-xl font-semibold mb-4">Reinstatement Rate by Reason</h3>
+          {/* Chart 4: Reinstatement Rate by Reason */}
+          <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6 shadow-sm">
+            <h3 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Reinstatement Rate by Reason</h3>
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={reinstatementRateChart} layout="vertical">
                 <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
@@ -366,21 +523,211 @@ export default function AnalyticsPage() {
               </BarChart>
             </ResponsiveContainer>
           </div>
+
+          {/* Chart 5: Niche/Category Distribution */}
+          {nicheChart.length > 0 && (
+            <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6 shadow-sm">
+              <h3 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Content Type Distribution</h3>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={nicheChart}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                  <XAxis 
+                    dataKey="name" 
+                    angle={-45}
+                    textAnchor="end"
+                    height={100}
+                    tick={{ fill: '#6B7280', fontSize: 12 }}
+                  />
+                  <YAxis tick={{ fill: '#9CA3AF' }} />
+                  <Tooltip 
+                    contentStyle={{ 
+                      backgroundColor: '#ffffff', 
+                      border: '1px solid #e5e7eb',
+                      borderRadius: '8px',
+                      color: '#111827'
+                    }}
+                  />
+                  <Bar dataKey="value" fill={COLORS.purple} radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          )}
+
+          {/* Chart 6: Subscriber Count Distribution */}
+          {subscriberChart.length > 0 && (
+            <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6 shadow-sm">
+              <h3 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Subscriber Count Distribution</h3>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={subscriberChart}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                  <XAxis dataKey="name" tick={{ fill: '#9CA3AF' }} />
+                  <YAxis tick={{ fill: '#9CA3AF' }} />
+                  <Tooltip 
+                    contentStyle={{ 
+                      backgroundColor: '#ffffff', 
+                      border: '1px solid #e5e7eb',
+                      borderRadius: '8px',
+                      color: '#111827'
+                    }}
+                  />
+                  <Bar dataKey="value" fill={COLORS.orange} radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          )}
+
+          {/* Chart 7: Termination Dates Over Time */}
+          {terminationDateChart.length > 0 && (
+            <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6 shadow-sm">
+              <h3 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Terminations Over Time</h3>
+              <ResponsiveContainer width="100%" height={300}>
+                <LineChart data={terminationDateChart}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                  <XAxis dataKey="name" tick={{ fill: '#9CA3AF' }} />
+                  <YAxis tick={{ fill: '#9CA3AF' }} />
+                  <Tooltip 
+                    contentStyle={{ 
+                      backgroundColor: '#ffffff', 
+                      border: '1px solid #e5e7eb',
+                      borderRadius: '8px',
+                      color: '#111827'
+                    }}
+                  />
+                  <Line type="monotone" dataKey="terminations" stroke={COLORS.red} strokeWidth={2} dot={{ fill: COLORS.red }} />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          )}
+
+          {/* Chart 8: Days Terminated Distribution */}
+          {daysTerminatedChart.length > 0 && (
+            <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6 shadow-sm">
+              <h3 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Duration of Terminations</h3>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={daysTerminatedChart}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                  <XAxis dataKey="name" tick={{ fill: '#9CA3AF', fontSize: 11 }} />
+                  <YAxis tick={{ fill: '#9CA3AF' }} />
+                  <Tooltip 
+                    contentStyle={{ 
+                      backgroundColor: '#ffffff', 
+                      border: '1px solid #e5e7eb',
+                      borderRadius: '8px',
+                      color: '#111827'
+                    }}
+                  />
+                  <Bar dataKey="value" fill={COLORS.yellow} radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          )}
+
+          {/* Chart 9: Reinstatement Rate by Subscriber Count */}
+          {subscriberReinstatementChart.length > 0 && (
+            <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6 shadow-sm">
+              <h3 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Reinstatement Rate by Channel Size</h3>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={subscriberReinstatementChart}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                  <XAxis dataKey="name" tick={{ fill: '#9CA3AF' }} />
+                  <YAxis 
+                    domain={[0, 100]} 
+                    tick={{ fill: '#9CA3AF' }}
+                    label={{ value: 'Reinstatement Rate (%)', angle: -90, position: 'insideLeft' }}
+                  />
+                  <Tooltip 
+                    contentStyle={{ 
+                      backgroundColor: '#ffffff', 
+                      border: '1px solid #e5e7eb',
+                      borderRadius: '8px',
+                      color: '#111827'
+                    }}
+                    formatter={(value: number | undefined) => [`${(value || 0).toFixed(1)}%`, 'Reinstatement Rate']}
+                  />
+                  <Bar dataKey="rate" fill={COLORS.green} radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          )}
+
+          {/* Chart 10: Appeal Outcome Timeline */}
+          {outcomeTimelineChart.length > 0 && (
+            <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6 shadow-sm">
+              <h3 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Appeal Outcomes Over Time</h3>
+              <ResponsiveContainer width="100%" height={300}>
+                <AreaChart data={outcomeTimelineChart}>
+                  <defs>
+                    <linearGradient id="colorReinstated" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor={COLORS.green} stopOpacity={0.8}/>
+                      <stop offset="95%" stopColor={COLORS.green} stopOpacity={0}/>
+                    </linearGradient>
+                    <linearGradient id="colorDenied" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor={COLORS.red} stopOpacity={0.8}/>
+                      <stop offset="95%" stopColor={COLORS.red} stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                  <XAxis dataKey="name" tick={{ fill: '#9CA3AF' }} />
+                  <YAxis tick={{ fill: '#9CA3AF' }} />
+                  <Tooltip 
+                    contentStyle={{ 
+                      backgroundColor: '#ffffff', 
+                      border: '1px solid #e5e7eb',
+                      borderRadius: '8px',
+                      color: '#111827'
+                    }}
+                  />
+                  <Legend />
+                  <Area type="monotone" dataKey="Reinstated" stackId="1" stroke={COLORS.green} fillOpacity={1} fill="url(#colorReinstated)" />
+                  <Area type="monotone" dataKey="Denied" stackId="1" stroke={COLORS.red} fillOpacity={1} fill="url(#colorDenied)" />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          )}
         </div>
 
         {/* Additional Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-          <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
-            <div className="text-gray-600 text-sm mb-2">Total Cases</div>
-            <div className="text-3xl font-bold text-gray-900">{cases.length}</div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4 mb-6 sm:mb-8">
+          <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6 shadow-sm">
+            <div className="text-gray-600 text-xs sm:text-sm mb-1 sm:mb-2">Total Cases</div>
+            <div className="text-2xl sm:text-3xl font-bold text-gray-900">{cases.length}</div>
           </div>
-          <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
-            <div className="text-gray-600 text-sm mb-2">Reinstatement Rate</div>
-            <div className="text-3xl font-bold text-green-600">
+          <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6 shadow-sm">
+            <div className="text-gray-600 text-xs sm:text-sm mb-1 sm:mb-2">Reinstatement Rate</div>
+            <div className="text-2xl sm:text-3xl font-bold text-green-600">
               {cases.length > 0 
                 ? `${((cases.filter(c => c.status === 'REINSTATED').length / cases.length) * 100).toFixed(1)}%`
                 : '0%'
               }
+            </div>
+          </div>
+          <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6 shadow-sm">
+            <div className="text-gray-600 text-xs sm:text-sm mb-1 sm:mb-2">Pending Appeals</div>
+            <div className="text-2xl sm:text-3xl font-bold text-yellow-600">{pendingAppeals}</div>
+          </div>
+          {avgSubscribers > 0 && (
+            <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6 shadow-sm">
+              <div className="text-gray-600 text-xs sm:text-sm mb-1 sm:mb-2">Avg Subscribers</div>
+              <div className="text-2xl sm:text-3xl font-bold text-blue-600">
+                {avgSubscribers >= 1000000 
+                  ? `${(avgSubscribers / 1000000).toFixed(1)}M`
+                  : avgSubscribers >= 1000
+                  ? `${(avgSubscribers / 1000).toFixed(1)}K`
+                  : avgSubscribers.toLocaleString()
+                }
+              </div>
+            </div>
+          )}
+          {avgDaysTerminated > 0 && (
+            <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6 shadow-sm">
+              <div className="text-gray-600 text-xs sm:text-sm mb-1 sm:mb-2">Avg Days Terminated</div>
+              <div className="text-2xl sm:text-3xl font-bold text-red-600">{avgDaysTerminated}</div>
+            </div>
+          )}
+          <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6 shadow-sm">
+            <div className="text-gray-600 text-xs sm:text-sm mb-1 sm:mb-2">Terminated</div>
+            <div className="text-2xl sm:text-3xl font-bold text-red-600">
+              {cases.filter(c => c.status === 'TERMINATED').length}
             </div>
           </div>
         </div>
