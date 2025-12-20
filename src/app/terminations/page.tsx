@@ -113,14 +113,83 @@ export default function TerminationsPage() {
           throw new Error(result.error);
         }
 
-        const rows = result.data || [];
+        let rows = result.data || [];
         const cols = result.meta?.columns || (rows.length > 0 ? Object.keys(rows[0]) : []);
 
-        // Fetch cases for linking
+        // Fetch cases for linking and sorting
+        let casesData: Case[] = [];
         if (casesResponse.ok) {
-          const casesData = await casesResponse.json();
+          casesData = await casesResponse.json();
           setCases(casesData || []);
         }
+
+        // Sort rows by Case ID in descending order (same logic as home page)
+        // Match rows to cases to get the proper case ID
+        rows = rows.sort((a: TerminationRow, b: TerminationRow) => {
+          // Helper function to get case ID for a row
+          const getCaseIdForRow = (row: TerminationRow): string => {
+            // First, try to find matching case by channel name or URL
+            const channelName = row['Channel Name'] || '';
+            const channelUrl = row['Channel URL'] || row['channel url'] || '';
+            
+            const matchingCase = casesData.find(c => 
+              (c.channelName && channelName && 
+               c.channelName.toLowerCase() === channelName.toLowerCase()) ||
+              (c.channelUrl && channelUrl && 
+               c.channelUrl.toLowerCase() === channelUrl.toLowerCase())
+            );
+            
+            if (matchingCase) {
+              return matchingCase.id;
+            }
+            
+            // Fallback: try to find Case ID in CSV row
+            return row['Case ID'] || row['case id'] || row['caseid'] || row['ID'] || row['id'] || '';
+          };
+
+          const caseIdA = getCaseIdForRow(a);
+          const caseIdB = getCaseIdForRow(b);
+
+          if (!caseIdA && !caseIdB) return 0;
+          if (!caseIdA) return 1; // Put items without case ID at the end
+          if (!caseIdB) return -1;
+
+          // Use the same sorting logic as the home page
+          const getSortValue = (id: string): number => {
+            // Remove "case-" prefix if present
+            const cleanId = id.replace(/^case-/i, '').trim();
+            
+            // Try to extract numeric value
+            const numericMatch = cleanId.match(/^0*(\d+)$/);
+            if (numericMatch) {
+              return parseInt(numericMatch[1], 10);
+            }
+            
+            // If not numeric, try to extract number from the end (e.g., "case-014" -> 14)
+            const endMatch = cleanId.match(/(\d+)$/);
+            if (endMatch) {
+              return parseInt(endMatch[1], 10);
+            }
+            
+            // For non-numeric IDs, use a large number to push them to the end
+            return -1;
+          };
+
+          const valueA = getSortValue(caseIdA);
+          const valueB = getSortValue(caseIdB);
+
+          // If both are numeric, sort descending
+          if (valueA >= 0 && valueB >= 0) {
+            return valueB - valueA; // Descending order
+          }
+          
+          // If one is numeric and one isn't, numeric comes first
+          if (valueA >= 0 && valueB < 0) return -1;
+          if (valueA < 0 && valueB >= 0) return 1;
+          
+          // If neither is numeric, sort alphabetically descending
+          return caseIdB.localeCompare(caseIdA);
+        });
 
         // Define priority columns to show first
         const priorityColumns = [

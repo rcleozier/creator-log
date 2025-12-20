@@ -28,6 +28,137 @@ function escapeHtml(text: string | undefined): string {
     .replace(/'/g, '&#039;');
 }
 
+function isUrl(str: string): boolean {
+  if (!str) return false;
+  try {
+    const url = new URL(str);
+    return url.protocol === 'http:' || url.protocol === 'https:';
+  } catch {
+    return str.startsWith('http://') || str.startsWith('https://') || str.startsWith('www.');
+  }
+}
+
+function formatUrl(url: string): string {
+  if (!url) return '';
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    return url;
+  }
+  if (url.startsWith('www.')) {
+    return `https://${url}`;
+  }
+  return `https://${url}`;
+}
+
+/**
+ * Converts plain text with URLs into React elements with clickable links
+ * Preserves line breaks and paragraph structure
+ */
+function formatTextWithUrls(text: string): React.ReactNode[] {
+  if (!text) return [];
+  
+  // Split by double line breaks for paragraphs, but preserve single line breaks
+  const paragraphs = text.split(/\n\n+/).filter(p => p.trim());
+  
+  return paragraphs.map((paragraph, paraIdx) => {
+    // Improved URL regex to catch URLs more reliably
+    // Matches http://, https://, or www. followed by valid URL characters
+    const urlRegex = /(https?:\/\/[^\s\)]+|www\.[^\s\)]+)/gi;
+    const parts: React.ReactNode[] = [];
+    let lastIndex = 0;
+    let match;
+    const matches: Array<{ index: number; url: string }> = [];
+    
+    // Collect all URL matches first
+    while ((match = urlRegex.exec(paragraph)) !== null) {
+      matches.push({ index: match.index, url: match[0] });
+    }
+    
+    // Process each URL match
+    matches.forEach((urlMatch, urlIdx) => {
+      // Add text before URL
+      if (urlMatch.index > lastIndex) {
+        const textBefore = paragraph.substring(lastIndex, urlMatch.index);
+        if (textBefore.trim()) {
+          // Preserve single line breaks within paragraphs
+          const lines = textBefore.split('\n');
+          lines.forEach((line, lineIdx) => {
+            if (line.trim()) {
+              parts.push(
+                <span key={`text-${paraIdx}-${lastIndex}-${lineIdx}`}>
+                  {escapeHtml(line)}
+                </span>
+              );
+            }
+            if (lineIdx < lines.length - 1) {
+              parts.push(<br key={`br-${paraIdx}-${lastIndex}-${lineIdx}`} />);
+            }
+          });
+        }
+      }
+      
+      // Add clickable URL
+      const formattedUrl = formatUrl(urlMatch.url);
+      parts.push(
+        <a
+          key={`url-${paraIdx}-${urlMatch.index}`}
+          href={formattedUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-600 hover:text-blue-800 underline break-all"
+        >
+          {escapeHtml(urlMatch.url)}
+        </a>
+      );
+      
+      lastIndex = urlMatch.index + urlMatch.url.length;
+    });
+    
+    // Add remaining text after last URL
+    if (lastIndex < paragraph.length) {
+      const textAfter = paragraph.substring(lastIndex);
+      if (textAfter.trim()) {
+        // Preserve single line breaks
+        const lines = textAfter.split('\n');
+        lines.forEach((line, lineIdx) => {
+          if (line.trim()) {
+            parts.push(
+              <span key={`text-${paraIdx}-${lastIndex}-${lineIdx}`}>
+                {escapeHtml(line)}
+              </span>
+            );
+          }
+          if (lineIdx < lines.length - 1) {
+            parts.push(<br key={`br-${paraIdx}-${lastIndex}-${lineIdx}`} />);
+          }
+        });
+      }
+    }
+    
+    // If no URLs found, just return the escaped text with preserved line breaks
+    if (parts.length === 0) {
+      const lines = paragraph.split('\n');
+      lines.forEach((line, lineIdx) => {
+        if (line.trim()) {
+          parts.push(
+            <span key={`text-${paraIdx}-${lineIdx}`}>
+              {escapeHtml(line)}
+            </span>
+          );
+        }
+        if (lineIdx < lines.length - 1) {
+          parts.push(<br key={`br-${paraIdx}-${lineIdx}`} />);
+        }
+      });
+    }
+    
+    return (
+      <p key={`para-${paraIdx}`} className="mb-4 last:mb-0">
+        {parts}
+      </p>
+    );
+  });
+}
+
 function getStatusColor(status: YouTubeCase['status']): string {
   switch (status) {
     case 'REINSTATED':
@@ -434,12 +565,9 @@ export default function CasePage() {
               </div>
             </div>
             <div className="prose prose-lg max-w-none">
-              <p className="text-gray-800 leading-relaxed text-lg whitespace-pre-wrap bg-gray-50 p-6 rounded-lg border-l-4 border-red-500">
-                {escapeHtml(caseData.description?.substring(0, 1000) || '')}
-                {caseData.description && caseData.description.length > 1000 && (
-                  <span className="text-gray-500 italic">... (truncated)</span>
-                )}
-              </p>
+              <div className="text-gray-800 leading-relaxed text-base sm:text-lg bg-gray-50 p-6 rounded-lg border-l-4 border-red-500">
+                {formatTextWithUrls(caseData.description)}
+              </div>
             </div>
           </div>
         )}

@@ -22,11 +22,21 @@ export const metadata: Metadata = {
     url: "https://opencreatorlog.com",
     siteName: "Open Creator Log",
     type: "website",
+    images: [
+      {
+        url: "https://opencreatorlog.com/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Open Creator Log - YouTube Channel Appeal Tracker",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Open Creator Log - YouTube Channel Appeal Tracker",
     description: "Tracking YouTube channel appeals and enforcement actions for transparency.",
+    images: ["https://opencreatorlog.com/og-image.png"],
+    creator: "@RobsManifesto",
   },
   metadataBase: new URL("https://opencreatorlog.com"),
 };

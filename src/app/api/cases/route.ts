@@ -255,6 +255,44 @@ export async function GET(request: Request) {
       );
     }
 
+    // Sort cases by case ID in descending order
+    cases.sort((a, b) => {
+      const getSortValue = (id: string): number => {
+        // Remove "case-" prefix if present
+        const cleanId = id.replace(/^case-/i, '').trim();
+        
+        // Try to extract numeric value
+        const numericMatch = cleanId.match(/^0*(\d+)$/);
+        if (numericMatch) {
+          return parseInt(numericMatch[1], 10);
+        }
+        
+        // If not numeric, try to extract number from the end (e.g., "case-014" -> 14)
+        const endMatch = cleanId.match(/(\d+)$/);
+        if (endMatch) {
+          return parseInt(endMatch[1], 10);
+        }
+        
+        // For non-numeric IDs, use a large number to push them to the end
+        return -1;
+      };
+
+      const valueA = getSortValue(a.id);
+      const valueB = getSortValue(b.id);
+
+      // If both are numeric, sort descending
+      if (valueA >= 0 && valueB >= 0) {
+        return valueB - valueA; // Descending order
+      }
+      
+      // If one is numeric and one isn't, numeric comes first
+      if (valueA >= 0 && valueB < 0) return -1;
+      if (valueA < 0 && valueB >= 0) return 1;
+      
+      // If neither is numeric, sort alphabetically descending
+      return b.id.localeCompare(a.id);
+    });
+
         return NextResponse.json(cases);
       } catch (error) {
         return NextResponse.json(
