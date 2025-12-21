@@ -39,3 +39,4 @@ export function generateCaseMetadata(caseData: YouTubeCase): Metadata {
   };
 }
 
+

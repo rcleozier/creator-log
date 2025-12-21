@@ -67,3 +67,4 @@ export function truncateText(text: string, maxLength: number = 1000): { truncate
   };
 }
 
+

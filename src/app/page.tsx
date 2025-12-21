@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { YouTubeCase, CaseStats } from '@/types/case';
+import { GOOGLE_FORM_URL } from '@/app/constants';
 import { DisclaimerBanner } from './components/DisclaimerBanner';
 import { Footer } from './components/Footer';
 import { Navigation } from './components/Navigation';
@@ -187,12 +188,14 @@ export default function Home() {
           </p>
           
           <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 mb-6">
-            <Link 
-              href="/submit"
+            <a
+              href={GOOGLE_FORM_URL}
+              target="_blank"
+              rel="noopener noreferrer"
               className="bg-red-600 hover:bg-red-700 text-white px-5 py-2.5 sm:px-6 sm:py-3 rounded-lg font-semibold transition-colors text-center text-sm sm:text-base"
             >
               Submit Your Case
-            </Link>
+            </a>
             <Link 
               href="/terminations"
               className="bg-white hover:bg-gray-50 text-gray-900 px-5 py-2.5 sm:px-6 sm:py-3 rounded-lg font-semibold transition-colors border border-gray-300 shadow-sm text-center text-sm sm:text-base"

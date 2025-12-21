@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import Link from 'next/link';
 import { DisclaimerBanner } from '@/app/components/DisclaimerBanner';
+import { GOOGLE_FORM_URL } from '@/app/constants';
 import { Footer } from '@/app/components/Footer';
 import { Navigation } from '@/app/components/Navigation';
 
@@ -118,12 +119,14 @@ export default function AboutPage() {
                 <li>Reason provided by YouTube</li>
               </ul>
               <div className="mt-6">
-                <Link
-                  href="/submit"
+                <a
+                  href={GOOGLE_FORM_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="inline-block bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
                 >
                   Submit a Case
-                </Link>
+                </a>
               </div>
             </div>
 
