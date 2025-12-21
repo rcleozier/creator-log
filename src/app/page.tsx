@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { YouTubeCase, CaseStats } from '@/types/case';
-import { GOOGLE_FORM_URL } from '@/app/constants';
 import { DisclaimerBanner } from './components/DisclaimerBanner';
 import { Footer } from './components/Footer';
 import { Navigation } from './components/Navigation';
@@ -189,7 +188,7 @@ export default function Home() {
           
           <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 mb-6">
             <a
-              href={GOOGLE_FORM_URL}
+              href="https://docs.google.com/forms/d/e/1FAIpQLSfoVwmHJyBCKI7ZScANz838kX6c5mthhUdiycbva_9_PIp97w/viewform?usp=dialog"
               target="_blank"
               rel="noopener noreferrer"
               className="bg-red-600 hover:bg-red-700 text-white px-5 py-2.5 sm:px-6 sm:py-3 rounded-lg font-semibold transition-colors text-center text-sm sm:text-base"

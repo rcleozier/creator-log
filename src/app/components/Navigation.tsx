@@ -7,7 +7,6 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { GOOGLE_FORM_URL } from '@/app/constants';
 
 export function Navigation() {
   const pathname = usePathname();
@@ -76,7 +75,7 @@ export function Navigation() {
               Methodology
             </Link>
             <a
-              href={GOOGLE_FORM_URL}
+              href="https://docs.google.com/forms/d/e/1FAIpQLSfoVwmHJyBCKI7ZScANz838kX6c5mthhUdiycbva_9_PIp97w/viewform?usp=dialog"
               target="_blank"
               rel="noopener noreferrer"
               className="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg font-semibold transition-colors text-sm sm:text-base"
